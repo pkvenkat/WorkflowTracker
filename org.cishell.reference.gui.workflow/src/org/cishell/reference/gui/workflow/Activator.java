@@ -24,7 +24,7 @@ import org.cishell.reference.gui.workspace.CIShellApplication;
 
 public class Activator extends AbstractUIPlugin implements IStartup{
 
-public static final String PLUGIN_ID = "Test6";
+public static final String PLUGIN_ID = "org.cishell.reference.gui.workflow";
 	private static Activator plugin;
 	private static BundleContext context;
 	private boolean waitForBundleContext;

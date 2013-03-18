@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Workflow
+Bundle-SymbolicName: org.cishell.reference.gui.workflow; singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.cishell.reference.gui.workflow.Activator
+Bundle-Localization: plugin
+Export-Package: org.cishell.reference.gui.workflow
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Import-Package: org.cishell.app.service.scheduler;version="1.0.0",
+ org.cishell.framework,
+ org.cishell.framework.algorithm,
+ org.cishell.framework.data,
+ org.cishell.reference.app.service.algorithminvocation,
+ org.cishell.reference.gui.workspace
+Eclipse-LazyStart: true

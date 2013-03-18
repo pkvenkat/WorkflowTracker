@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Export-Package: org.cishell.reference.gui.workflow
+Require-Bundle: org.eclipse.ui,org.eclipse.core.runtime
+Eclipse-LazyStart: true
+Bundle-Version: 1.0.0
+Bundle-Localization: plugin
+Bundle-Name: Scheduler GUI Plug-in
+Bundle-Activator: org.cishell.reference.gui.worklfow.Activator
+Bundle-ManifestVersion: 2
+Import-Package: org.cishell.app.service.scheduler;version="1.0.0",org.
+ cishell.framework,org.cishell.framework.algorithm,org.cishell.framewo
+ rk.data,org.cishell.reference.app.service.algorithminvocation,org.cis
+ hell.reference.gui.workspace
+Bundle-SymbolicName: org.cishell.reference.gui.workflow;singleton:=tru
+ e
+

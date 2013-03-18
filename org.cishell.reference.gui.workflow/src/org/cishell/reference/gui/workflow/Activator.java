@@ -90,8 +90,21 @@ public static final String PLUGIN_ID = "org.cishell.reference.gui.workflow";
 				Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
 					System.err.println( "Running");
-					 
-					Action scheduler = new WorkflowAction();
+					try {	            	
+	                    IWorkbench bench = PlatformUI.getWorkbench();
+	                    if(bench != null)
+	                    {
+	                    	IWorkbenchWindow window =	bench.getActiveWorkbenchWindow();
+	                    if(window!= null)	{
+	                    	window.getActivePage().showView(WorkflowView.ID_VIEW);
+	                         }
+	                    }
+	                    
+	                } catch (PartInitException e) {
+	                    e.printStackTrace();
+	                }
+					
+					/*Action scheduler = new WorkflowAction();
 					IMenuManager manager = CIShellApplication.getMenuManager();
 					
 					
@@ -124,7 +137,7 @@ public static final String PLUGIN_ID = "org.cishell.reference.gui.workflow";
 						System.err.println("The menu manager is still null. Surprise.");
 					} else {
 						otherManagerReference.update(true);
-					}
+					}*/
 				}
 			});
 			waitForBundleContext = false;
@@ -134,7 +147,7 @@ public static final String PLUGIN_ID = "org.cishell.reference.gui.workflow";
 		}
 	}
 	
-    private class WorkflowAction extends Action {
+   /* private class WorkflowAction extends Action {
         public WorkflowAction(){
             super("Workflow", IAction.AS_CHECK_BOX);
             setId("workflow");
@@ -172,5 +185,5 @@ public static final String PLUGIN_ID = "org.cishell.reference.gui.workflow";
         }	    
     }
 	
-	
+	*/
 }

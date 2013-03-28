@@ -1,4 +1,4 @@
-package org.cishell.reference.gui.workflow.views;
+package org.cishell.reference.gui.workflow.model;
 
 import java.util.Calendar;
 import java.util.Hashtable;
@@ -82,6 +82,7 @@ public class SchedulerContentModel implements SchedulerListener {
 	}
 
 	public void algorithmScheduled(Algorithm algorithm, Calendar time) {
+		System.out.println("Algorithm Scheduled");
 		for (int i = 0; i < schedulerListenerList.size(); ++i) {
 			SchedulerListener schedulerListener = (SchedulerListener)schedulerListenerList.get(i);
 			schedulerListener.algorithmScheduled(algorithm, time);

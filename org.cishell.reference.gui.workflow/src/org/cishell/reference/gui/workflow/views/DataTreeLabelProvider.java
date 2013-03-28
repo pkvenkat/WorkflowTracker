@@ -35,8 +35,8 @@ public class DataTreeLabelProvider extends LabelProvider {
      * displayed in the Tree
      */
     public Image getImage(Object element) {
-        if (element instanceof DataGUIItem) {
-            return ((DataGUIItem) element).getIcon();            
+        if (element instanceof WorkflowTreeItem) {
+            return ((WorkflowTreeItem) element).getIcon();            
         }
 
         return null;
@@ -52,8 +52,8 @@ public class DataTreeLabelProvider extends LabelProvider {
      * @return the text to display for the given DataModelTreeView element
      */
     public String getText(Object element) {
-        if (element instanceof DataGUIItem) {
-           return ((DataGUIItem) element).getLabel();
+        if (element instanceof WorkflowTreeItem) {
+           return ((WorkflowTreeItem) element).getLabel();
           }
 
         return null;

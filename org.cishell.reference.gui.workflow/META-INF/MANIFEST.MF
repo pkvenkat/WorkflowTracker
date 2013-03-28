@@ -17,5 +17,7 @@ Import-Package: org.cishell.app.service.scheduler;version="1.0.0",
  org.cishell.framework.algorithm,
  org.cishell.framework.data,
  org.cishell.reference.app.service.algorithminvocation,
- org.cishell.reference.gui.workspace
+ org.cishell.reference.gui.workspace,
+ org.cishell.reference.service.metatype,
+ org.osgi.service.metatype;version="1.2.0"
 Eclipse-LazyStart: true

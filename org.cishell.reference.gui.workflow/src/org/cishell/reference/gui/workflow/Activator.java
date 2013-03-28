@@ -134,6 +134,17 @@ public static final String PLUGIN_ID = "org.cishell.reference.gui.workflow";
 		}
 	}
 	
+	public static Object getService(String servicePID) {
+		ServiceReference serviceReference =
+			Activator.context.getServiceReference(servicePID);
+
+		if (serviceReference != null) {
+			return Activator.context.getService(serviceReference);
+		} else {
+			return null;
+		}
+	}
+	
     private class WorkflowAction extends Action {
         public WorkflowAction(){
             super("Workflow", IAction.AS_CHECK_BOX);

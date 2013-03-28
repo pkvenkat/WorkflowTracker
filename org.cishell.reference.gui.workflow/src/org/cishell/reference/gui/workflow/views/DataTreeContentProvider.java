@@ -29,8 +29,19 @@ public class DataTreeContentProvider implements ITreeContentProvider {
      * @return Returns the children of the given TreeView element
      */
     public Object[] getChildren(Object parentElement) {
-        if (parentElement instanceof DataGUIItem) {
-            return ((DataGUIItem) parentElement).getChildren();
+        if (parentElement instanceof WorkflowGUI) {
+        	WorkflowGUI wfg= (WorkflowGUI)parentElement;
+        	if(WorkflowView.getDefault().isRootItem(wfg)){
+        		return  wfg.getRootsChildren();
+        	}
+        	else 
+        	{
+        		return wfg.getChildren();
+        	}
+        }        
+        else if(parentElement instanceof WorkflowTreeItem)
+        {
+        	return ((WorkflowTreeItem)parentElement).getChildren(); 
         }
 
         return EMPTY_ARRAY;
@@ -45,8 +56,8 @@ public class DataTreeContentProvider implements ITreeContentProvider {
      * @return the parent of the given TreeView element
      */
     public Object getParent(Object element) {
-        if (element instanceof DataGUIItem) {
-            return ((DataGUIItem) element).getParent();
+        if (element instanceof WorkflowTreeItem) {
+            return ((WorkflowTreeItem) element).getParent();
         }
 
         return null;

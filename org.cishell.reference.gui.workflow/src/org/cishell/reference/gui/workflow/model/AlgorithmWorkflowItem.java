@@ -1,14 +1,18 @@
 package org.cishell.reference.gui.workflow.model;
 
+import org.cishell.framework.algorithm.Algorithm;
+
 public class AlgorithmWorkflowItem implements WorkflowItem {
 	private String name;
 	private Long internalId;
+	private Algorithm algo;
+	
 
-	public  AlgorithmWorkflowItem(String name, Long id)
+	public  AlgorithmWorkflowItem(String name, Long id, Algorithm algo)
 	{
 		this.name = name;
 		this.internalId = id;
-		
+		this.algo = algo;		
 	}
 	@Override
 	public String getType() {
@@ -30,6 +34,11 @@ public class AlgorithmWorkflowItem implements WorkflowItem {
 	@Override
 	public Long getIternalId() {
 		return internalId;
+	}
+	
+	public Algorithm getAlgorithm()
+	{
+		return algo;
 	}
 
 }

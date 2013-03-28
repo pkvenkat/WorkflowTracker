@@ -2,7 +2,7 @@ package org.cishell.reference.gui.workflow.controller;
 
 import java.util.LinkedHashMap;
 
-import org.cishell.reference.gui.workflow.Utilities.Constants;
+import org.cishell.reference.gui.workflow.Utilities.Constant;
 import org.cishell.reference.gui.workflow.model.Workflow;
 import org.cishell.reference.gui.workflow.model.NormalWorkflow;
 
@@ -31,14 +31,14 @@ public class WorkflowManager {
   {
 	  Long newID =getUniqueInternalId();
 	  //needed to move this to constants file
-	  if(type == Constants.NormalWorkflow){
+	  if(type == Constant.NormalWorkflow){
 		  currentWorkflow= new NormalWorkflow(name,newID);
 		  map.put(newID, currentWorkflow);
        }
 	  return currentWorkflow;
   }
   
-  private Long getUniqueInternalId()
+public Long getUniqueInternalId()
   {
 	  return lastCreatedID +1;
   }

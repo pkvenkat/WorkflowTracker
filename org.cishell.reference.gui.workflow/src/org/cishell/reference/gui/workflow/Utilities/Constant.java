@@ -4,4 +4,6 @@ public class Constant {
 public final static String NormalWorkflow = "NormalWorkflow";
 public final static String Workflow = "Workflow";
 public final static String WorkflowItem = "WorkflowItem";
+public final static String Label = "label";
+
 }

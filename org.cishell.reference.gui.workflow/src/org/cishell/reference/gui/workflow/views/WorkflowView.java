@@ -16,6 +16,7 @@
 package org.cishell.reference.gui.workflow.views;
 
 
+import java.io.File;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -42,12 +43,15 @@ import org.cishell.reference.gui.workflow.model.WorkflowItem;
 import org.cishell.reference.gui.workflow.views.WorkflowGUI;
 import org.cishell.reference.gui.workflow.views.DataTreeContentProvider;
 import org.cishell.reference.gui.workflow.views.DataTreeLabelProvider;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -63,6 +67,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.part.ViewPart;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 import org.osgi.service.metatype.AttributeDefinition;
@@ -168,7 +173,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		MenuItem newItem = new MenuItem(this.whiteSpacemenu, SWT.PUSH);
 		newItem.setText("New Workflow");
 
-		
+		newItem.addListener(SWT.Selection, new NewWorkflow());
 		
         addNewWorkflow("Default Workflow");
 		SchedulerContentModel.getInstance().register(this);             
@@ -354,6 +359,8 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 			return ;
 		}	
 			
+		final GeneralTreeItem  paramItem = new GeneralTreeItem("Parameters",Constant.Label, dataItem,getImage("matrix.png","org.cishell.reference.gui.workflow"));
+		dataItem.addChild(paramItem);
 		ObjectClassDefinition obj = provider.getObjectClassDefinition(metatypePID, null);		
 		if (obj != null) {
 			AttributeDefinition[] attr =
@@ -362,9 +369,25 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 			for (int i = 0; i < attr.length; i++) {
 				String id = attr[i].getID();
 				String name = attr[i].getName();
-				System.out.println( "id=" +id +"name="+ name +"\n");
+				//System.out.println( "id=" +id +"name="+ name +"\n");
+				GeneralTreeItem  treeItem = new GeneralTreeItem( name, Constant.Label,paramItem, getImage("matrix.png","org.cishell.reference.gui.workflow"));
+				paramItem.addChildren(treeItem);				
 			}
 		}
+		
+		guiRun(new Runnable() {
+			public void run() {
+				if (!tree.isDisposed()) {
+					// update the TreeView
+					WorkflowView.this.viewer.refresh();
+					// context menu may need to have options enabled/disabled
+					// based on the new selection
+					// update the global selection
+					WorkflowView.this.viewer.expandToLevel(paramItem, 0);
+				}
+			}
+		});
+		
 
 	}
 
@@ -393,12 +416,6 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 			Display.getDefault().syncExec(run);
 		}
 	}
-	
-	private class SaveListener implements Listener {
-		public void handleEvent(Event event) {
-					}
-	}
-	
 	protected MetaTypeProvider getPossiblyMutatedMetaTypeProvider(
 			String metatypePID, String pid,	AlgorithmFactory factory, ServiceReference serviceRef)
 			throws AlgorithmCreationFailedException {
@@ -473,6 +490,38 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		return false;
 	}
 	
+	 public static Image getImage(String name, String brandPluginID) {
+	        if (Platform.isRunning()) {
+	        	String imageLocation =
+	        		String.format("%sicons%s%s", File.separator, File.separator, name);
+	            ImageDescriptor imageDescriptor =
+	            	AbstractUIPlugin.imageDescriptorFromPlugin(brandPluginID, imageLocation);
+
+	            if (imageDescriptor != null) {
+	            	return imageDescriptor.createImage(); 
+	            } else {
+	            	String errorMessage = String.format(
+	            		"Could not find the icon '%s' in '%s'. Using the default image instead.",
+	            		imageLocation,
+	            		brandPluginID);
+	            	System.err.println(errorMessage);
+                    //need to change
+	            	return WorkflowItemGUI.getDefaultImage();
+	            }
+	   
+	        } else {
+	        	String format =
+	        		"Could not obtain the image '%s' in '%s', since the platform was not " +
+	        		"running (?). Using the default image instead.";
+	        	String errorMessage = String.format(format, name, brandPluginID);
+	        	System.err.println(errorMessage);
+                //need to change
+	        	return WorkflowItemGUI.getDefaultImage();
+	        }            
+	    }
+
+	
+	
 	private class DatamodelSelectionListener extends SelectionAdapter {
 		public void widgetSelected(SelectionEvent e) {
 			System.out.println("DatamodelSelectionListener called ");
@@ -492,6 +541,19 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		}
 	}
 
+	private class SaveListener implements Listener {
+		public void handleEvent(Event event) {
+					}
+	}
+
+	private class NewWorkflow implements Listener {
+		public void handleEvent(Event event) {
+			WorkflowView.this.addNewWorkflow("Test3");
+					}
+	}
+	
+	
+	
 	
 	
 }

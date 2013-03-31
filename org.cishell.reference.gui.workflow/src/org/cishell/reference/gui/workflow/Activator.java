@@ -83,15 +83,28 @@ public static final String PLUGIN_ID = "org.cishell.reference.gui.workflow";
                     
     }
 
-	public void earlyStartup() {
+    public void earlyStartup() {
 		System.err.println( "Inside early Start");
 
 		if (context != null) {
 				Display.getDefault().asyncExec(new Runnable() {
 				public void run() {
 					System.err.println( "Running");
-					 
-					Action scheduler = new WorkflowAction();
+					try {	            	
+	                    IWorkbench bench = PlatformUI.getWorkbench();
+	                    if(bench != null)
+	                    {
+	                    	IWorkbenchWindow window =	bench.getActiveWorkbenchWindow();
+	                    if(window!= null)	{
+	                    	window.getActivePage().showView(WorkflowView.ID_VIEW);
+	                         }
+	                    }
+	                    
+	                } catch (PartInitException e) {
+	                    e.printStackTrace();
+	                }
+					
+					/*Action scheduler = new WorkflowAction();
 					IMenuManager manager = CIShellApplication.getMenuManager();
 					
 					
@@ -124,7 +137,7 @@ public static final String PLUGIN_ID = "org.cishell.reference.gui.workflow";
 						System.err.println("The menu manager is still null. Surprise.");
 					} else {
 						otherManagerReference.update(true);
-					}
+					}*/
 				}
 			});
 			waitForBundleContext = false;
@@ -133,8 +146,8 @@ public static final String PLUGIN_ID = "org.cishell.reference.gui.workflow";
 			waitForBundleContext = true;
 		}
 	}
-	
-	public static Object getService(String servicePID) {
+
+    public static Object getService(String servicePID) {
 		ServiceReference serviceReference =
 			Activator.context.getServiceReference(servicePID);
 
@@ -145,43 +158,5 @@ public static final String PLUGIN_ID = "org.cishell.reference.gui.workflow";
 		}
 	}
 	
-    private class WorkflowAction extends Action {
-        public WorkflowAction(){
-            super("Workflow", IAction.AS_CHECK_BOX);
-            setId("workflow");
-        }
-        
-        public void run(){
-            if(this.isChecked()){
-				System.err.println( "Checked");
-	            try {	            	
-                    IWorkbench bench = PlatformUI.getWorkbench();
-                    if(bench != null)
-                    {
-                    	IWorkbenchWindow window =	bench.getActiveWorkbenchWindow();
-                    if(window!= null)	{
-                    	window.getActivePage().showView(WorkflowView.ID_VIEW);
-                         }
-                    }
-                    
-                } catch (PartInitException e) {
-                    e.printStackTrace();
-                }
-            }
-            else{
-            	IWorkbench bench = PlatformUI.getWorkbench();
-                if(bench != null)
-                {
-                	IWorkbenchWindow window =	bench.getActiveWorkbenchWindow();
-                    if(window!= null)	{
-                	window.getActivePage().hideView(WorkflowView.getDefault());
-                    }
-                }
-				System.err.println( "UnChecked");
-
-           }
-        }	    
-    }
-	
-	
+  
 }

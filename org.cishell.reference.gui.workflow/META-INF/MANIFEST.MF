@@ -12,7 +12,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Import-Package: org.cishell.app.service.scheduler;version="1.0.0",
+Import-Package: org.cishell.app.service.datamanager;version="1.0.0",
+ org.cishell.app.service.scheduler;version="1.0.0",
  org.cishell.framework,
  org.cishell.framework.algorithm,
  org.cishell.framework.data,

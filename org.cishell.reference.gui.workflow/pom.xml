@@ -7,7 +7,7 @@
     <groupId>org.cishell.clients.gui</groupId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <groupId>org.cishell.clients.gui</groupId>
+  <groupId>org.ci1shell.clients.gui</groupId>
   <artifactId>org.cishell.reference.gui.workflow</artifactId>
   <version>1.0.0</version>
   <packaging>eclipse-plugin</packaging>

@@ -18,6 +18,8 @@ package org.cishell.reference.gui.workflow.views;
 
 import java.io.File;
 import java.util.Calendar;
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
@@ -35,6 +37,7 @@ import org.cishell.framework.algorithm.AlgorithmProperty;
 import org.cishell.framework.algorithm.AllParametersMutatedOutException;
 import org.cishell.framework.algorithm.ParameterMutator;
 import org.cishell.framework.data.Data;
+import org.cishell.reference.gui.menumanager.menu.AlgorithmWrapper;
 import org.cishell.reference.gui.workflow.Utilities.Constant;
 
 import org.cishell.reference.gui.workflow.controller.WorkflowManager;
@@ -80,9 +83,8 @@ import org.osgi.service.metatype.MetaTypeService;
 import org.osgi.service.metatype.ObjectClassDefinition;
 
 import org.cishell.reference.gui.workflow.Activator;
-import org.cishell.reference.service.metatype.BasicMetaTypeProvider;
 import org.osgi.framework.Constants;
-
+//import org.cishell.service.metadata.*;
 
 /**
  * Creates and maintains the overall GUI for the scheduler.  Controls the
@@ -163,6 +165,8 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		
 		MenuItem runItem = new MenuItem(this.menu, SWT.PUSH);
 		runItem.setText("Run");
+		RunListener runListener = new RunListener();
+		runItem.addListener(SWT.Selection,runListener);
 		
 		MenuItem deleteItem = new MenuItem(this.menu, SWT.PUSH);
 		deleteItem.setText("Delete");
@@ -186,7 +190,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
     protected String getMetaTypeID(ServiceReference ref) {
 		String pid = (String) ref.getProperty(Constants.SERVICE_PID);
 		String metatype_pid = (String) ref.getProperty(AlgorithmProperty.PARAMETERS_PID);
-
+		//String metatype_pid ="parameters_pid2;
 		if (metatype_pid == null) {
 			metatype_pid = pid;
 		}
@@ -310,7 +314,26 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 	
 	@Override
 	public void algorithmFinished(Algorithm algorithm, Data[] createdData) {
-		// TODO Auto-generated method stub
+		
+		System.out.println("Algorithm class name="+algorithm.getClass());
+		
+			AlgorithmWrapper algo = (AlgorithmWrapper)algorithm;
+			Dictionary<String, Object> parameters= algo.getParameters();
+			
+			if(parameters != null)
+			{
+				
+				for (Enumeration e = parameters.keys(); e.hasMoreElements();) {
+					String key = (String) e.nextElement();
+					Object value = parameters.get(key);
+					System.out.println("Key ="+ key +"\n");
+					System.out.println("value ="+ value.toString() +"\n");
+
+				}
+		
+		   }
+		
+				// TODO Auto-generated method stub
 		ServiceReference serviceReference = Activator
 				.getSchedulerService().getServiceReference(algorithm);
 		String algorithmLabel = "";
@@ -363,7 +386,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 
 			return ;
 		}	
-			
+				
 		final GeneralTreeItem  paramItem = new GeneralTreeItem("Parameters",Constant.Label, dataItem,getImage("matrix.png","org.cishell.reference.gui.workflow"));
 		dataItem.addChild(paramItem);
 		ObjectClassDefinition obj = provider.getObjectClassDefinition(metatypePID, null);		
@@ -427,9 +450,12 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		MetaTypeProvider provider = null;
 		MetaTypeService metaTypeService = (MetaTypeService)
 			Activator.getService(MetaTypeService.class.getName());
+		
+		//ParameterMetaTypeProvider provider2  =(ParameterMetaTypeProvider)Activator.getService(ParameterMetaTypeProvider.class.getName());
 		if (metaTypeService != null) {
 			provider = metaTypeService.getMetaTypeInformation(serviceRef.getBundle());
 		}
+		
 
 		if ((factory instanceof ParameterMutator) && (provider != null)) {
 			try {
@@ -469,7 +495,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 	 */
 	private class ContextMenuListener extends MouseAdapter {
 		public void mouseUp(MouseEvent event) {
-			System.out.println("Mouse Event");
+			//System.out.println("Mouse Event");
 			if (event.button == 3) {
 				System.out.println(" Inside Mouse Event");
 
@@ -529,7 +555,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 	
 	private class DatamodelSelectionListener extends SelectionAdapter {
 		public void widgetSelected(SelectionEvent e) {
-			System.out.println("DatamodelSelectionListener called ");
+			//System.out.println("DatamodelSelectionListener called ");
 		/*	Tree tree = (Tree) e.getSource();
 			TreeItem[] selection = tree.getSelection();
 			Set<Data> models = new HashSet<Data>();
@@ -568,6 +594,11 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 			WorkflowSaver state = new WorkflowSaver();
 			state.write();
 		}
+	}
+	
+	private class RunListener implements Listener {
+		public void handleEvent(Event event) {
+					}
 	}
 
 	private class NewWorkflow implements Listener {

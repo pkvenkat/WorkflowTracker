@@ -23,6 +23,8 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.JOptionPane;
+
 
 import org.cishell.app.service.scheduler.SchedulerListener;
 import org.cishell.framework.algorithm.Algorithm;
@@ -34,7 +36,9 @@ import org.cishell.framework.algorithm.AllParametersMutatedOutException;
 import org.cishell.framework.algorithm.ParameterMutator;
 import org.cishell.framework.data.Data;
 import org.cishell.reference.gui.workflow.Utilities.Constant;
+
 import org.cishell.reference.gui.workflow.controller.WorkflowManager;
+import org.cishell.reference.gui.workflow.controller.WorkflowSaver;
 import org.cishell.reference.gui.workflow.model.AlgorithmWorkflowItem;
 import org.cishell.reference.gui.workflow.model.SchedulerContentModel;
 import org.cishell.reference.gui.workflow.model.Workflow;
@@ -95,6 +99,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 	private Menu menu;
 	private Menu whiteSpacemenu;
 	private SaveListener saveListener;
+	
 
     /**
      * Registers itself to a model, and creates the map from algorithm to 
@@ -543,7 +548,26 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 
 	private class SaveListener implements Listener {
 		public void handleEvent(Event event) {
-					}
+			System.out.println("Save button is clicked");
+//			new Thread(
+//					new Runnable(){
+//							public void run(){
+//			savedState = WorkflowManager.getInstance();
+//		String saveFileName = (String)JOptionPane.showInputDialog(null,
+//    			    "Enter File Name", "Save",
+//    			    JOptionPane.PLAIN_MESSAGE,null,null,null);
+////		if(saveFileName!=null && !saveFileName.isEmpty()) {
+////				if(!saveFileName.endsWith(".xml"))
+////					saveFileName = saveFileName+".xml";
+//			WorkflowSaver state = new WorkflowSaver();
+//				state.write(savedState);
+//							}}).start();
+			
+				//	}
+			
+			WorkflowSaver state = new WorkflowSaver();
+			state.write();
+		}
 	}
 
 	private class NewWorkflow implements Listener {

@@ -57,9 +57,9 @@ public class WorkflowManager {
   }
   
   
-public Long getUniqueInternalId()
+  public Long getUniqueInternalId()
   {
 	  return lastCreatedID++;
   }
-   
+  
 }

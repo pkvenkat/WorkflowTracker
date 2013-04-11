@@ -9,10 +9,13 @@ Export-Package: org.cishell.reference.gui.workflow
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ org.cishell.saver.xstresm;bundle-version="1.0.0",
+ org.cishell.reference.gui.menumanager;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Import-Package: org.cishell.app.service.datamanager;version="1.0.0",
+Import-Package: com.thoughtworks.xstream,
+ org.cishell.app.service.datamanager;version="1.0.0",
  org.cishell.app.service.scheduler;version="1.0.0",
  org.cishell.framework,
  org.cishell.framework.algorithm,
@@ -25,3 +28,4 @@ Import-Package: org.cishell.app.service.datamanager;version="1.0.0",
  org.cishell.service.guibuilder;version="1.0.0",
  org.osgi.service.metatype;version="1.2.0"
 Eclipse-LazyStart: true
+Bundle-ClassPath: .

@@ -51,8 +51,10 @@ public class WorkflowGUI implements WorkflowTreeItem {
     private Image vectorImageIcon;
     private Image modelIcon;
     private Image rIcon;
+    private Workflow workflow;
     
-    private Map<String, Image> typeToImage = new HashMap<String, Image>();
+    
+	private Map<String, Image> typeToImage = new HashMap<String, Image>();
     //for root
     private Collection<WorkflowGUI> children = new ArrayList<WorkflowGUI>();
     private Collection<WorkflowItemGUI> workFlowItemChildren = new ArrayList<WorkflowItemGUI>();
@@ -71,7 +73,8 @@ public class WorkflowGUI implements WorkflowTreeItem {
     
     public WorkflowGUI(Workflow workflow, WorkflowGUI parent,int type) {
     	if(workflow !=null)
-    	    label = workflow.getName();    	
+    	    label = workflow.getName();
+    	this.workflow = workflow;
     	this.brandPluginID = "org.cishell.reference.gui.workflow";
 //      matrixIcon      = getImage("matrix.png", this.brandPluginID);
       modelIcon       = getImage("tree.png", this.brandPluginID);
@@ -215,4 +218,14 @@ public class WorkflowGUI implements WorkflowTreeItem {
 		// TODO Auto-generated method stub
 		return Constant.Workflow;
 	}
+	
+	public Workflow getWorkflow() {
+		return workflow;
+	}
+
+
+	public void setWorkflow(Workflow workflow) {
+		this.workflow = workflow;
+	}
+
 }

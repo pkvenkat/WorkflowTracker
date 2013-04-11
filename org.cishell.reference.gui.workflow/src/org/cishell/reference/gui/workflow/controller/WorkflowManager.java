@@ -53,14 +53,13 @@ public class WorkflowManager {
 								DataManagerService.class.getName()));
 	  Data[] data = dataManager.getSelectedData();
 	  System.out.println(data[0].getMetadata().get(DataProperty.LABEL));
-	  
 	  return true;
   }
   
   
 public Long getUniqueInternalId()
   {
-	  return lastCreatedID +1;
+	  return lastCreatedID++;
   }
    
 }

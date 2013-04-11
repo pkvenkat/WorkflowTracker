@@ -71,11 +71,8 @@ public class WorkflowItemGUI implements WorkflowTreeItem {
     public WorkflowItemGUI(WorkflowItem wfItem, WorkflowGUI parent) {
     	if(wfItem instanceof AlgorithmWorkflowItem){
     	
-    		AlgorithmWorkflowItem awfItem = (AlgorithmWorkflowItem)wfItem;
-    		Algorithm algo =awfItem.getAlgorithm();
-                 
-            ServiceReference serviceReference = Activator
-				.getSchedulerService().getServiceReference(algo);
+    		AlgorithmWorkflowItem awfItem = (AlgorithmWorkflowItem)wfItem;                 
+            ServiceReference serviceReference = awfItem.getServiceReference();
 	
 		    if (serviceReference != null) {
 			     label = (String) serviceReference

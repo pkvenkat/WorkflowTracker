@@ -6,5 +6,6 @@ public interface Workflow {
 	// user can create workflows with the same name
 	public Long getInternalId();
 	public void run();
-	
+	public void add(WorkflowItem item);
+
 }

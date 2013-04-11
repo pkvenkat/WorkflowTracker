@@ -17,6 +17,8 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
 import org.cishell.app.service.scheduler.SchedulerService;
+import org.cishell.framework.CIShellContext;
+import org.cishell.framework.LocalCIShellContext;
 import org.cishell.reference.gui.workflow.views.WorkflowView;
 import org.cishell.reference.gui.workspace.CIShellApplication;
 
@@ -27,6 +29,8 @@ public class Activator extends AbstractUIPlugin implements IStartup{
 public static final String PLUGIN_ID = "org.cishell.reference.gui.workflow";
 	private static Activator plugin;
 	private static BundleContext context;
+    private static CIShellContext ciShellContext;
+	
 	private boolean waitForBundleContext;
     private LogService logger;
 
@@ -40,6 +44,8 @@ public static final String PLUGIN_ID = "org.cishell.reference.gui.workflow";
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		Activator.context = context;
+        ciShellContext = new LocalCIShellContext(context);
+
 		if (waitForBundleContext) {
 			//System.out.println( "Inside Start");
 			earlyStartup();
@@ -103,41 +109,6 @@ public static final String PLUGIN_ID = "org.cishell.reference.gui.workflow";
 	                } catch (PartInitException e) {
 	                    e.printStackTrace();
 	                }
-					
-					/*Action scheduler = new WorkflowAction();
-					IMenuManager manager = CIShellApplication.getMenuManager();
-					
-					
-					IMenuManager newManager = null;
-					for (int i = 0; i < ATTEMPTS_TO_FIND_TOOLBAR && newManager == null; i++) {
-						try {
-						Thread.sleep(SLEEP_TIME);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-						newManager = manager.findMenuUsingPath("File");
-					}
-					
-					manager = manager.findMenuUsingPath("File");
-					
-					if (manager == null) {
-						System.err.println( "Unable to add workflow to File menu, since File menu does not exist.");
-					} else {
-						manager.appendToGroup("start", scheduler);
-					}
-					System.err.println( "Running2");
-					WorkflowView view = WorkflowView.getDefault();
-					boolean visible = view != null
-							&& PlatformUI.getWorkbench()
-									.getActiveWorkbenchWindow().getActivePage()
-									.isPartVisible(view);
-					scheduler.setChecked(visible);
-					IMenuManager otherManagerReference = CIShellApplication.getMenuManager();
-					if(otherManagerReference == null) {
-						System.err.println("The menu manager is still null. Surprise.");
-					} else {
-						otherManagerReference.update(true);
-					}*/
 				}
 			});
 			waitForBundleContext = false;
@@ -158,5 +129,13 @@ public static final String PLUGIN_ID = "org.cishell.reference.gui.workflow";
 		}
 	}
 	
+    public static CIShellContext getCiShellContext() {
+		return ciShellContext;
+	}
+
+	public static void setCiShellContext(CIShellContext ciShellContext) {
+		Activator.ciShellContext = ciShellContext;
+	}
+
   
 }

@@ -58,7 +58,7 @@ public class NormalWorkflow implements Workflow {
 			if(item instanceof AlgorithmWorkflowItem)
 			{
 				AlgorithmWorkflowItem algo = (AlgorithmWorkflowItem)item;				
-				algo.setInputData(dataManager.getSelectedData());
+				algo.setInputData(data);
 				System.out.println("Running Algorithm" + algo.getName());
 				data = (Data[])algo.run();		
 				System.out.println("Completed Running Algorithm" + algo.getName());

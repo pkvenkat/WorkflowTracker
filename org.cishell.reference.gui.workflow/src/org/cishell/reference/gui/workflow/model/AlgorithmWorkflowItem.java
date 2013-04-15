@@ -11,6 +11,8 @@ import org.cishell.framework.algorithm.AlgorithmCreationFailedException;
 import org.cishell.framework.algorithm.AlgorithmExecutionException;
 import org.cishell.framework.algorithm.AlgorithmFactory;
 import org.cishell.framework.algorithm.AlgorithmProperty;
+import org.cishell.framework.algorithm.ProgressMonitor;
+import org.cishell.framework.algorithm.ProgressTrackable;
 import org.cishell.framework.data.Data;
 import org.cishell.reference.gui.workflow.Activator;
 import org.cishell.reference.gui.workflow.Utilities.Constant;
@@ -47,11 +49,16 @@ public class AlgorithmWorkflowItem implements WorkflowItem {
 		AlgorithmFactory factory =
 				(AlgorithmFactory) Activator.getContext().getService(serviceReference);
 		
-		try {
-			Algorithm algo = factory.createAlgorithm(inputData, parameters, Activator.getCiShellContext());
-			
-			return algo.execute();
-			
+		Algorithm algo = factory.createAlgorithm(inputData, parameters, Activator.getCiShellContext());	
+		 if(algo instanceof ProgressTrackable)
+		    {
+		    	ProgressTrackable pt = (ProgressTrackable) algo;
+		    	pt.setProgressMonitor(new  AlgorithmProgressMonitor());		    	
+		    }
+		try {      
+
+			Data[] data = algo.execute();
+			return data;			
 		}
 		catch (AlgorithmExecutionException e) {
 			String logMessage = String.format(
@@ -86,7 +93,7 @@ public class AlgorithmWorkflowItem implements WorkflowItem {
 					e.getMessage());
 				builder.showError("Error!", errorMessage, e);
 				return null;
-			}	
+			}
 	}
 
 	public void dataSelected(Data[] selectedData) {        
@@ -257,7 +264,81 @@ private String[] separateInData(String inDataString) {
 		return true;
 	}
 
+	private class AlgorithmProgressMonitor implements ProgressMonitor {
+		private double totalWorkUnits;
 
+		public void describeWork(String currentWork) {
+		}
+
+		public void done() {
+		}
+
+		public boolean isCanceled() {
+			return false;
+		}
+
+		public boolean isPaused() {
+			return false;
+		}
+
+		public void setCanceled(boolean value) {
+		}
+
+		public void setPaused(boolean value) {
+		}
+
+		public void start(int capabilities, int totalWorkUnits) {		}
+
+		public void start(int capabilities, double totalWorkUnits) {
+			if ((capabilities & ProgressMonitor.CANCELLABLE) > 0){
+				//SchedulerTableItem.this.isCancellable = true;
+			}
+
+			if ((capabilities & ProgressMonitor.PAUSEABLE) > 0) {
+				//SchedulerTableItem.this.isPauseable = true;
+			}
+
+			if ((capabilities & ProgressMonitor.WORK_TRACKABLE) > 0) {
+				/*refresh();
+				SchedulerTableItem.this.isWorkTrackable = true;
+				guiRun(new Runnable() {
+					public void run() {
+						Table table = (Table) progressBar.getParent();
+						SchedulerTableItem.this.progressBar.dispose();
+						SchedulerTableItem.this.progressBar = new ProgressBar(table, SWT.NONE);
+						SchedulerTableItem.this.progressBar.setSelection(progressBar.getMinimum());
+						SchedulerTableItem.this.tableEditor = new TableEditor(table);
+						SchedulerTableItem.this.tableEditor.grabHorizontal = true;
+						SchedulerTableItem.this.tableEditor.grabVertical = true;
+						SchedulerTableItem.this.tableEditor.setEditor(
+							SchedulerTableItem.this.progressBar,
+							SchedulerTableItem.this.tableItem,
+							SchedulerView.PERCENT_COLUMN);
+					}
+				});*/
+			}
+
+			this.totalWorkUnits = totalWorkUnits;
+		}
+
+		public void worked(final int work) {
+			worked((double) work);
+		}
+
+		public void worked(final double work) {
+			/*guiRun(new Runnable() {
+				public void run() {
+					if (!SchedulerTableItem.this.progressBar.isDisposed()) {
+						SchedulerTableItem.this.progressSelection = (int) (
+							SchedulerTableItem.this.progressBar.getMaximum() *
+							(work / AlgorithmProgressMonitor.this.totalWorkUnits));
+					}
+				}
+			});
+
+			refresh();*/
+		}
+	}
 
 
 }

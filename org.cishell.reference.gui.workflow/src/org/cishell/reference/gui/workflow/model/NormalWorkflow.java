@@ -8,17 +8,22 @@ import java.util.Map;
 
 import org.cishell.app.service.datamanager.DataManagerService;
 import org.cishell.framework.algorithm.AlgorithmProperty;
+import org.cishell.framework.algorithm.ProgressMonitor;
 import org.cishell.framework.data.Data;
 import org.cishell.framework.data.DataProperty;
 import org.cishell.service.conversion.Converter;
 import org.cishell.service.conversion.DataConversionService;
 import org.eclipse.core.internal.registry.osgi.Activator;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.widgets.ProgressBar;
+import org.eclipse.swt.widgets.Table;
 import org.osgi.framework.BundleContext;
 
 public class NormalWorkflow implements Workflow {
 	private String name;
 	private Long id;
-	private LinkedHashMap<Long, WorkflowItem> map ;
+	private LinkedHashMap<Long, WorkflowItem> map;
 
 	public  NormalWorkflow(String name, Long id)
 	{
@@ -72,11 +77,15 @@ public class NormalWorkflow implements Workflow {
         map.put(item.getIternalId(), item);		
 	}
 
+<<<<<<< HEAD
 	@Override
 	public void remove(WorkflowItem item) {
 		map.remove(item.getIternalId());
 		
 	}
+=======
+	
+>>>>>>> aa7ebf91539eeb77d860d50426e957a5969914cb
 	
     	
 }

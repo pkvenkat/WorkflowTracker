@@ -19,19 +19,13 @@ package org.cishell.reference.gui.workflow.views;
 import java.io.File;
 import java.util.Calendar;
 import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Map;
-import java.util.Set;
 
-import javax.swing.JOptionPane;
 
 
 import org.cishell.app.service.scheduler.SchedulerListener;
 import org.cishell.framework.algorithm.Algorithm;
 import org.cishell.framework.algorithm.AlgorithmCreationFailedException;
-import org.cishell.framework.algorithm.AlgorithmExecutionException;
 import org.cishell.framework.algorithm.AlgorithmFactory;
 import org.cishell.framework.algorithm.AlgorithmProperty;
 import org.cishell.framework.algorithm.AllParametersMutatedOutException;
@@ -104,8 +98,11 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 	private RunListener runListener;
 	private DeleteListener deleteListener;
 	private Algorithm errorAlgorithm;
+	private WorkflowMode mode;
 
-    /**
+    
+
+	/**
      * Registers itself to a model, and creates the map from algorithm to 
      * GUI item.
      */
@@ -259,7 +256,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 	
 	@Override
 	public void algorithmFinished(Algorithm algorithm, Data[] createdData) {
-		if(algorithm.equals(errorAlgorithm)) return;
+		if(algorithm.equals(errorAlgorithm) || mode == WorkflowMode.RUNNING) return;
 		System.out.println("Algorithm class name="+algorithm.getClass());
 		Dictionary<String, Object> parameters = null;
 		if(algorithm instanceof AlgorithmWrapper){
@@ -335,8 +332,8 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 			for (int i = 0; i < attr.length; i++) {
 				String id = attr[i].getID();
 				String name = attr[i].getName();
-				String value =(String)parameters.get(id);
-				//System.out.println( "id=" +id +"name="+ name +"\n");
+				String value =parameters.get(id).toString();
+				System.out.println( "id=" +id +"name="+ name +"\n");
 				GeneralTreeItem  paramName = new GeneralTreeItem( name, Constant.ParameterName, paramItem, getImage("matrix.png","org.cishell.reference.gui.workflow"));
 				paramItem.addChildren(paramName);
 				GeneralTreeItem  paramValue = new GeneralTreeItem( value, Constant.ParameterValue, paramName, getImage("matrix.png","org.cishell.reference.gui.workflow"));
@@ -385,6 +382,10 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		} else {
 			Display.getDefault().syncExec(run);
 		}
+	}
+	
+	public WorkflowMode getMode() {
+		return mode;
 	}
 	protected MetaTypeProvider getPossiblyMutatedMetaTypeProvider(
 			String metatypePID, String pid,	AlgorithmFactory factory, ServiceReference serviceRef)
@@ -571,8 +572,9 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		    if(type == Constant.Workflow)
 		    {
 				System.out.print("Is of type workflow");
-
+                WorkflowView.this.mode = WorkflowMode.RUNNING;
 			   ((WorkflowGUI)itm).getWorkflow().run();
+			   WorkflowView.this.mode = WorkflowMode.STOPPED;
 		    }
 		}
 	}

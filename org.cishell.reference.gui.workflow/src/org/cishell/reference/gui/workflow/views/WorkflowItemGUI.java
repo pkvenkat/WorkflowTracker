@@ -212,6 +212,6 @@ public class WorkflowItemGUI implements WorkflowTreeItem {
 	@Override
 	public String getType() {
 		// TODO Auto-generated method stub
-		return Constant.WorkflowItem;
+		return Constant.WorkflowUIItem;
 	}
 }

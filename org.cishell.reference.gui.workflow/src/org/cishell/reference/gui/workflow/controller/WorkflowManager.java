@@ -56,6 +56,9 @@ public class WorkflowManager {
 	  return true;
   }
   
+  public void removeWorkflow(Workflow workflow){
+	  map.remove(workflow.getInternalId());
+  }
   
   public Long getUniqueInternalId()
   {

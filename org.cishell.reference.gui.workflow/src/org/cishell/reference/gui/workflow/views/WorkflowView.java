@@ -102,6 +102,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 	private Menu whiteSpacemenu;
 	private SaveListener saveListener;
 	private RunListener runListener;
+	private DeleteListener deleteListener;
 	private Algorithm errorAlgorithm;
 
     /**
@@ -171,6 +172,8 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		
 		MenuItem deleteItem = new MenuItem(this.menu, SWT.PUSH);
 		deleteItem.setText("Delete");
+		this.deleteListener = new DeleteListener();
+		deleteItem.addListener(SWT.Selection, this.deleteListener);
 		
 		//this.tree.setMenu(this.menu);
 		
@@ -247,6 +250,11 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 				}
 			}
 		});	
+	}
+	
+	public void removeWorkflow(Workflow workflow){
+		WorkflowManager.getInstance().removeWorkflow(workflow);
+		WorkflowView.this.viewer.refresh();
 	}
 	
 	@Override
@@ -523,6 +531,32 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 			WorkflowSaver state = new WorkflowSaver();
 			state.write();
 		}
+	}
+	
+	private class DeleteListener implements Listener {
+
+		@Override
+		public void handleEvent(Event arg0) {
+			try{
+			TreeItem[] items = WorkflowView.this.tree.getSelection();
+			if(items.length !=1) return;
+			 WorkflowTreeItem itm =(WorkflowTreeItem)items[0].getData();
+			 String type = itm.getType();
+			 if(type == Constant.Workflow)
+			 {
+				WorkflowView.this.removeWorkflow((Workflow)itm);
+			 }else if (type==Constant.WorkflowUIItem){
+				 for(Object child : ((WorkflowItemGUI)itm).getChildren()){
+					 ((WorkflowItemGUI)itm).removeChild((WorkflowItemGUI)child);
+				 }
+				 WorkflowView.this.viewer.refresh();				 
+			 }
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+			 
+		}
+		
 	}
 	
 	private class RunListener implements Listener {

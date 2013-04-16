@@ -111,8 +111,12 @@ public class NormalWorkflow implements Workflow {
 		}
 		}catch (Exception e){
 			e.printStackTrace();
-		}
-	
+		}	
+	}
+
+	@Override
+	public void setName(String name) {
+        this.name= name;		
 	}
 
 	

@@ -555,15 +555,15 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 			{
                 System.out.println("Inside Parameter Value!!!!!!!!!!!!!");
 
-				String paramName = wfTreeItem.getParent().getLabel();
-				WorkflowTreeItem alfoITem = wfTreeItem.getParent().getParent().getParent();
+				 String paramName = wfTreeItem.getParent().getLabel();
+				 WorkflowTreeItem alfoITem = wfTreeItem.getParent().getParent().getParent();
 				
-				System.out.println(" !!!!Type of the Object"+alfoITem.getType());
-			    AlgorithmWorkflowItem wfg = (AlgorithmWorkflowItem)((AlgorithmItemGUI)alfoITem).getWfItem();	
+				 System.out.println(" !!!!Type of the Object"+alfoITem.getType());
+			     AlgorithmWorkflowItem wfg = (AlgorithmWorkflowItem)((AlgorithmItemGUI)alfoITem).getWfItem();	
 			    // we are getting the type of the parameter and  using reflection we are creating the object
-			   Object obj = wfg.getParameterValue(paramName);
-			   if(obj != null)
-			   {
+			     Object obj = wfg.getParameterValue(paramName);
+			     if(obj != null)
+			     {
 				   //As reflecion does not work it is a work around
 				   if(obj instanceof String)
 				   {
@@ -603,11 +603,8 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 			} 					
 			else if(wfTreeItem.getType() == Constant.Workflow)
 			{			
-				
-			}
-			else if(wfTreeItem.getType() == Constant.AlgorithmItem)
-			{				
-			}
+				((WorkflowGUI)wfTreeItem).getWorkflow().setName(newLabel);
+			}		
 			viewer.refresh(); 
 			this.newEditor.dispose();
 			updatingTreeItem = false;

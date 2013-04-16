@@ -3,6 +3,7 @@ package org.cishell.reference.gui.workflow.model;
 public interface Workflow {
 	
 	public String  getName();
+	public void setName(String name);
 	// user can create workflows with the same name
 	public Long getInternalId();
 	public void run();

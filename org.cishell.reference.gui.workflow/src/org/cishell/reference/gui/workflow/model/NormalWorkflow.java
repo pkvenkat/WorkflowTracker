@@ -2,9 +2,11 @@ package org.cishell.reference.gui.workflow.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.cishell.app.service.datamanager.DataManagerService;
 import org.cishell.framework.algorithm.AlgorithmProperty;
@@ -19,6 +21,7 @@ import org.eclipse.swt.custom.TableEditor;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Table;
 import org.osgi.framework.BundleContext;
+
 
 public class NormalWorkflow implements Workflow {
 	private String name;
@@ -75,6 +78,41 @@ public class NormalWorkflow implements Workflow {
 	@Override
 	public void add(WorkflowItem item) {
         map.put(item.getIternalId(), item);		
+	}
+
+
+	@Override
+	public void remove(WorkflowItem item) {
+		try{
+		boolean flag=false;
+		LinkedHashMap<Long, WorkflowItem> currentMap = map;
+		
+		Set set =currentMap.entrySet();
+		Iterator i = set.iterator();
+//		for(Map.Entry<Long, WorkflowItem> entry: currentMap.entrySet())
+//		{
+//			Long id = entry.getKey();
+//			if(entry.getKey()==item.getIternalId()){
+//				flag = true;
+//			}
+//			if(flag==true){
+//				map.remove(id);
+//			}
+//		}
+		
+		while(i.hasNext()){
+			Map.Entry me = (Map.Entry) i.next();
+			if(me.getKey()==item.getIternalId()){
+				flag = true;
+			}
+			if(flag==true){
+				map.remove(me);
+			}		
+		}
+		}catch (Exception e){
+			e.printStackTrace();
+		}
+	
 	}
 
 	

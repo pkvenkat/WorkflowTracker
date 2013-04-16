@@ -7,5 +7,6 @@ public interface Workflow {
 	public Long getInternalId();
 	public void run();
 	public void add(WorkflowItem item);
+	public void remove(WorkflowItem item);
 
 }

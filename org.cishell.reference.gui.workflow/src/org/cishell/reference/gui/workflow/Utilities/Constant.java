@@ -4,7 +4,7 @@ public class Constant {
 	
 	public final static String NormalWorkflow = "NormalWorkflow";
 	public final static String Workflow = "Workflow";
-	public final static String WorkflowItem = "WorkflowItem";
+	public final static String AlgorithmUIItem = "AlgorithmUIItem";
 	public final static String AlgorithmItem = "AlgorithmItem";
 	public final static String Label = "label";
 	public final static String ParameterName = "ParamName";

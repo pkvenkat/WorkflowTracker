@@ -99,12 +99,15 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 	private Menu whiteSpacemenu;
 	private SaveListener saveListener;
 	private RunListener runListener;
+	private DeleteListener deleteListener;
 	private Algorithm errorAlgorithm;
 	private WorkflowMode mode;
+
 	private TreeEditor editor;
 	private Text newEditor;
 	private boolean updatingTreeItem;
-
+	private WorkflowTreeItem currentParentItem;
+    
 	/**
      * Registers itself to a model, and creates the map from algorithm to 
      * GUI item.
@@ -168,6 +171,8 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		
 		MenuItem deleteItem = new MenuItem(this.menu, SWT.PUSH);
 		deleteItem.setText("Delete");
+		this.deleteListener = new DeleteListener();
+		deleteItem.addListener(SWT.Selection, this.deleteListener);
 		
 		MenuItem changeItem = new MenuItem(this.menu, SWT.PUSH);
 		changeItem.setText("Change");
@@ -241,6 +246,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		Workflow workfFlow = WorkflowManager.getInstance().createWorkflow(name, Constant.NormalWorkflow);
 		final WorkflowGUI dataItem=	new WorkflowGUI(workfFlow, this.currentWorkFlowItem, 1);
 		this.currentWorkFlowItem =  dataItem;
+		this.currentParentItem = dataItem;
 		this.rootItem.addChild(dataItem);
 		guiRun(new Runnable() {
 			public void run() {
@@ -255,6 +261,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 			}
 		});	
 	}
+	
 	
 	@Override
 	public void algorithmFinished(Algorithm algorithm, Data[] createdData) {
@@ -280,10 +287,14 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		String pid = (String) serviceReference.getProperty(Constants.SERVICE_PID);
 		AlgorithmWorkflowItem wfi = new AlgorithmWorkflowItem(algorithmLabel, WorkflowManager.getInstance().getUniqueInternalId(),serviceReference);
 		wfi.setParameters(parameters);
+		wfi.setWorkflow(currentWorkFlowItem.getWorkflow());
 		currentWorkFlowItem.getWorkflow().add(wfi);
 		System.out.println("Algorithm with name"+algorithmLabel+"started");
-		final WorkflowItemGUI dataItem=	new WorkflowItemGUI(wfi, this.currentWorkFlowItem);
-		this.currentWorkFlowItem.addChild(dataItem);
+		final AlgorithmItemGUI dataItem=	new AlgorithmItemGUI(wfi, this.currentParentItem);
+		this.currentParentItem.addChild(dataItem);
+		System.out.println("current Parent Item !!!!!!!!!!"+ currentParentItem.getType()+" "+currentParentItem.getLabel());
+		this.currentParentItem = dataItem;
+		//this.currentWorkFlowItem.addChild(dataItem);
 		
 		guiRun(new Runnable() {
 			public void run() {
@@ -487,7 +498,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 	            		brandPluginID);
 	            	System.err.println(errorMessage);
                     //need to change
-	            	return WorkflowItemGUI.getDefaultImage();
+	            	return AlgorithmItemGUI.getDefaultImage();
 	            }
 	   
 	        } else {
@@ -497,7 +508,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 	        	String errorMessage = String.format(format, name, brandPluginID);
 	        	System.err.println(errorMessage);
                 //need to change
-	        	return WorkflowItemGUI.getDefaultImage();
+	        	return AlgorithmItemGUI.getDefaultImage();
 	        }            
 	    }
 
@@ -576,7 +587,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 									
 				
 			}
-			else if(wfTreeItem.getType() == Constant.WorkflowItem)
+			else if(wfTreeItem.getType() == Constant.AlgorithmItem)
 			{
 				
 			}
@@ -606,6 +617,49 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 			WorkflowSaver state = new WorkflowSaver();
 			state.write();
 		}
+	}
+	
+	private class DeleteListener implements Listener {
+
+		@Override
+		public void handleEvent(Event arg0) {
+			try{
+			TreeItem[] items = WorkflowView.this.tree.getSelection();
+			if(items.length !=1) return;
+			 WorkflowTreeItem itm =(WorkflowTreeItem)items[0].getData();
+			 String type = itm.getType();
+			 if(type == Constant.Workflow)
+			 {	
+				 WorkflowGUI wfGUI = (WorkflowGUI) itm;
+				 System.out.println("Delete "+ wfGUI.getLabel() + " Type:"+ type);
+				 WorkflowManager.getInstance().removeWorkflow(wfGUI.getWorkflow());//model
+				 itm.removeAllChildren();//GUI
+				 rootItem.removeChild(wfGUI);//GUI
+				 WorkflowView.this.viewer.refresh();
+			 }else if (type==Constant.AlgorithmUIItem){
+				 AlgorithmItemGUI aiGUI = (AlgorithmItemGUI) itm;
+				 System.out.println("Delete "+ aiGUI.getLabel() + " Type:"+ type);
+				 AlgorithmWorkflowItem wfItem = (AlgorithmWorkflowItem) aiGUI.getWfItem();
+				 
+				 Workflow wf = wfItem.getWorkflow();
+				 
+				 
+				 WorkflowTreeItem parent = itm.getParent();//GUI
+				 itm.removeAllChildren();
+				 parent.removeChild(itm);
+				 rootItem.removeChild(aiGUI);
+				 WorkflowView.this.viewer.refresh();			
+				 wf.remove(wfItem);//model
+
+			 }else{
+				 System.out.println("Cant Delete GeneralItem");
+			 }
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+			 
+		}
+		
 	}
 	
 	private class RunListener implements Listener {

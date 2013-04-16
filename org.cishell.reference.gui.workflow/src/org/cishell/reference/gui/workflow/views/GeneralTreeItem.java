@@ -57,5 +57,27 @@ public class GeneralTreeItem implements WorkflowTreeItem {
 	public void setLabel(String label) {
        this.label = label;		
 	}
+	public void removeAllChildren() {
+		children.clear();
+		
+	}
+
+	@Override
+	public boolean hasChild(WorkflowTreeItem wfTreeItem) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void removeChild(WorkflowTreeItem wfTreeItem) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void addChild(WorkflowTreeItem wfTreeItem) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

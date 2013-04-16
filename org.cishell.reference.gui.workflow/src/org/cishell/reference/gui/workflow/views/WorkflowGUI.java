@@ -57,7 +57,7 @@ public class WorkflowGUI implements WorkflowTreeItem {
 	private Map<String, Image> typeToImage = new HashMap<String, Image>();
     //for root
     private Collection<WorkflowGUI> children = new ArrayList<WorkflowGUI>();
-    private Collection<WorkflowItemGUI> workFlowItemChildren = new ArrayList<WorkflowItemGUI>();
+    private Collection<AlgorithmItemGUI> workFlowItemChildren = new ArrayList<AlgorithmItemGUI>();
 
     private Algorithm algorithm;
     private String label;
@@ -136,7 +136,7 @@ public class WorkflowGUI implements WorkflowTreeItem {
         return this.children.toArray();
     }
     
-    public void addChild(WorkflowItemGUI item) {
+    public void addChild(AlgorithmItemGUI item) {
         this.workFlowItemChildren.add(item);
     }
     /**
@@ -232,4 +232,31 @@ public class WorkflowGUI implements WorkflowTreeItem {
         this.label = label;		
 	}
 
+	@Override
+	public void removeAllChildren() {
+		workFlowItemChildren.clear();
+	}
+
+
+	@Override
+	public boolean hasChild(WorkflowTreeItem wfTreeItem) {
+		// TODO Auto-generated method stub
+		return workFlowItemChildren.contains(wfTreeItem);
+	}
+
+
+	@Override
+	public void removeChild(WorkflowTreeItem wfTreeItem) {
+		workFlowItemChildren.remove(wfTreeItem);
+		
+	}
+
+
+	@Override
+	public void addChild(WorkflowTreeItem wfTreeItem) {
+		if(wfTreeItem instanceof AlgorithmItemGUI )
+			this.workFlowItemChildren.add((AlgorithmItemGUI)wfTreeItem);
+		
+	}
+	
 }

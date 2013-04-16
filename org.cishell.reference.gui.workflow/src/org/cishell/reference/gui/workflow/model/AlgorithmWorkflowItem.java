@@ -30,6 +30,7 @@ public class AlgorithmWorkflowItem implements WorkflowItem {
 	private Dictionary<String, Object> parameters;	
 	private Data[] inputData;
 	protected Converter[][] converters;
+	private Workflow workflow;
 
 	
 	public  AlgorithmWorkflowItem(String name, Long id, ServiceReference algoRef)
@@ -338,6 +339,13 @@ private String[] separateInData(String inDataString) {
 
 			refresh();*/
 		}
+	}
+
+	public Workflow getWorkflow() {
+		return workflow;
+	}
+	public void setWorkflow(Workflow workflow) {
+		this.workflow = workflow;
 	}
 
 

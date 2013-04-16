@@ -71,7 +71,8 @@ public class AlgorithmItemGUI implements WorkflowTreeItem {
     public AlgorithmItemGUI(WorkflowItem wfItem, WorkflowTreeItem parent) {
     	if(wfItem instanceof AlgorithmWorkflowItem){
     	
-    		AlgorithmWorkflowItem awfItem = (AlgorithmWorkflowItem)wfItem;                 
+    		AlgorithmWorkflowItem awfItem = (AlgorithmWorkflowItem)wfItem;  
+    		this.wfItem = wfItem;
             ServiceReference serviceReference = awfItem.getServiceReference();
 	
 		    if (serviceReference != null) {
@@ -231,5 +232,10 @@ public class AlgorithmItemGUI implements WorkflowTreeItem {
 		children.remove(wfTreeItem);
 		
 	}
+
+	public WorkflowItem getWfItem() {
+		return wfItem;
+	}
+
 	
 }

@@ -247,6 +247,14 @@ public class WorkflowGUI implements WorkflowTreeItem {
 		workFlowItemChildren.remove(wfTreeItem);
 		
 	}
+
+
+	@Override
+	public void addChild(WorkflowTreeItem wfTreeItem) {
+		if(wfTreeItem instanceof AlgorithmItemGUI )
+			this.workFlowItemChildren.add((AlgorithmItemGUI)wfTreeItem);
+		
+	}
 	
 
 }

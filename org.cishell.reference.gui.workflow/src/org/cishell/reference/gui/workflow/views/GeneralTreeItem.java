@@ -71,4 +71,10 @@ public class GeneralTreeItem implements WorkflowTreeItem {
 		
 	}
 
+	@Override
+	public void addChild(WorkflowTreeItem wfTreeItem) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -414,17 +414,6 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 				if (objectClassDefinition == null) {
 					//logNullOCDWarning(pid, metatypePID);
 				}
-
-				/*try {
-					objectClassDefinition =
-						((ParameterMutator) factory).mutateParameters(data, objectClassDefinition);
-
-					if (objectClassDefinition != null) {
-						provider = new BasicMetaTypeProvider(objectClassDefinition);
-					}
-				} catch (AllParametersMutatedOutException e) {
-					provider = null;
-				}*/
 			} catch (IllegalArgumentException e) {
 				//log(LogService.LOG_DEBUG, pid + " has an invalid metatype id: " + metatypePID, e);
 			}
@@ -664,11 +653,13 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 				 itm.removeAllChildren();//GUI
 				 rootItem.removeChild(wfGUI);//GUI
 				 WorkflowView.this.viewer.refresh();
+				 if(WorkflowView.this.rootItem.getChildren().length == 0){
+					 WorkflowView.this.addNewWorkflow("Defaul Workflow");
+				 }
 			 }else if (type==Constant.AlgorithmUIItem){
 				 AlgorithmItemGUI aiGUI = (AlgorithmItemGUI) itm;
 				 System.out.println("Delete "+ aiGUI.getLabel() + " Type:"+ type);
-				 AlgorithmWorkflowItem wfItem = (AlgorithmWorkflowItem) aiGUI.getWfItem();
-				 
+				 AlgorithmWorkflowItem wfItem = (AlgorithmWorkflowItem) aiGUI.getWfItem();				 
 				 Workflow wf = wfItem.getWorkflow();
 				 
 				 WorkflowTreeItem parent = itm.getParent();//GUI
@@ -677,6 +668,10 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 				 rootItem.removeChild(aiGUI);
 				 WorkflowView.this.viewer.refresh();			
 				 wf.remove(wfItem);//model
+				 if(parent.getChildren().length == 0)
+				 {
+					 WorkflowView.this.currentParentItem = WorkflowView.this.currentWorkFlowItem;
+				 }
 
 			 }else{
 				 System.out.println("Cant Delete GeneralItem");

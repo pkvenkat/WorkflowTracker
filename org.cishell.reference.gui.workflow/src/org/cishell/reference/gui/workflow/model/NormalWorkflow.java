@@ -77,15 +77,14 @@ public class NormalWorkflow implements Workflow {
         map.put(item.getIternalId(), item);		
 	}
 
-<<<<<<< HEAD
+
 	@Override
 	public void remove(WorkflowItem item) {
 		map.remove(item.getIternalId());
 		
 	}
-=======
+
 	
->>>>>>> aa7ebf91539eeb77d860d50426e957a5969914cb
 	
     	
 }

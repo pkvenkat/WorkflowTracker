@@ -9,5 +9,8 @@ public interface WorkflowTreeItem {
 	public WorkflowTreeItem getParent();
 	public Image getIcon();
 	public Object[] getChildren();
+	public void removeAllChildren(); //--use for deleting all WorkflowTreeItem(so far: workFlowGUI, workflowItemGUI, GeneralTreeItem)
+	public boolean hasChild(WorkflowTreeItem wfTreeItem);
+	public void removeChild(WorkflowTreeItem wfTreeItem);
 
 }

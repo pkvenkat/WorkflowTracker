@@ -53,4 +53,22 @@ public class GeneralTreeItem implements WorkflowTreeItem {
 		children.add(child);
 	}
 
+	@Override
+	public void removeAllChildren() {
+		children.clear();
+		
+	}
+
+	@Override
+	public boolean hasChild(WorkflowTreeItem wfTreeItem) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void removeChild(WorkflowTreeItem wfTreeItem) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

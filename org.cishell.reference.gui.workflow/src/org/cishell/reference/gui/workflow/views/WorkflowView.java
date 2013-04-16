@@ -249,10 +249,6 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		});	
 	}
 	
-	public void removeWorkflow(Workflow workflow){
-		WorkflowManager.getInstance().removeWorkflow(workflow);
-		WorkflowView.this.viewer.refresh();
-	}
 	
 	@Override
 	public void algorithmFinished(Algorithm algorithm, Data[] createdData) {
@@ -280,7 +276,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		wfi.setParameters(parameters);
 		currentWorkFlowItem.getWorkflow().add(wfi);
 		System.out.println("Algorithm with name"+algorithmLabel+"started");
-		final WorkflowItemGUI dataItem=	new WorkflowItemGUI(wfi, this.currentWorkFlowItem);
+		final AlgorithmItemGUI dataItem=	new AlgorithmItemGUI(wfi, this.currentWorkFlowItem);
 		this.currentWorkFlowItem.addChild(dataItem);
 		
 		guiRun(new Runnable() {
@@ -482,7 +478,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 	            		brandPluginID);
 	            	System.err.println(errorMessage);
                     //need to change
-	            	return WorkflowItemGUI.getDefaultImage();
+	            	return AlgorithmItemGUI.getDefaultImage();
 	            }
 	   
 	        } else {
@@ -492,7 +488,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 	        	String errorMessage = String.format(format, name, brandPluginID);
 	        	System.err.println(errorMessage);
                 //need to change
-	        	return WorkflowItemGUI.getDefaultImage();
+	        	return AlgorithmItemGUI.getDefaultImage();
 	        }            
 	    }
 
@@ -544,13 +540,23 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 			 WorkflowTreeItem itm =(WorkflowTreeItem)items[0].getData();
 			 String type = itm.getType();
 			 if(type == Constant.Workflow)
-			 {
-				WorkflowView.this.removeWorkflow((Workflow)itm);
-			 }else if (type==Constant.WorkflowUIItem){
-				 for(Object child : ((WorkflowItemGUI)itm).getChildren()){
-					 ((WorkflowItemGUI)itm).removeChild((WorkflowItemGUI)child);
-				 }
+			 {	
+				 WorkflowGUI wfGUI = (WorkflowGUI) itm;
+				 System.out.println("Delete "+ wfGUI.getLabel() + " Type:"+ type);
+				 WorkflowManager.getInstance().removeWorkflow(wfGUI.getWorkflow());//model
+				 itm.removeAllChildren();//GUI
+				 rootItem.removeChild(wfGUI);//GUI
+				 WorkflowView.this.viewer.refresh();
+			 }else if (type==Constant.AlgorithmUIItem){
+				 AlgorithmItemGUI aiGUI = (AlgorithmItemGUI) itm;
+				 System.out.println("Delete "+ aiGUI.getLabel() + " Type:"+ type);
+				 WorkflowTreeItem parent = itm.getParent();
+				 itm.removeAllChildren();
+				 parent.removeChild(itm);//model
+				 rootItem.removeChild(aiGUI);
 				 WorkflowView.this.viewer.refresh();				 
+			 }else{
+				 System.out.println("Cant Delete GeneralItem");
 			 }
 			}catch(Exception e){
 				e.printStackTrace();

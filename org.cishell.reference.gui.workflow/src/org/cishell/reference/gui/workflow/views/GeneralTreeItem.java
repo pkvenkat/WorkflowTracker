@@ -53,4 +53,9 @@ public class GeneralTreeItem implements WorkflowTreeItem {
 		children.add(child);
 	}
 
+	@Override
+	public void setLabel(String label) {
+       this.label = label;		
+	}
+
 }

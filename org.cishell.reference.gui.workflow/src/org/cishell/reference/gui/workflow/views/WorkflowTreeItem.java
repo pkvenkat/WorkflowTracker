@@ -9,5 +9,6 @@ public interface WorkflowTreeItem {
 	public WorkflowTreeItem getParent();
 	public Image getIcon();
 	public Object[] getChildren();
+	public void setLabel(String label);
 
 }

@@ -223,9 +223,13 @@ public class WorkflowGUI implements WorkflowTreeItem {
 		return workflow;
 	}
 
-
 	public void setWorkflow(Workflow workflow) {
 		this.workflow = workflow;
+	}
+
+	@Override
+	public void setLabel(String label) {
+        this.label = label;		
 	}
 
 }

@@ -31,6 +31,7 @@ import org.cishell.framework.algorithm.AlgorithmProperty;
 import org.cishell.framework.algorithm.AllParametersMutatedOutException;
 import org.cishell.framework.algorithm.ParameterMutator;
 import org.cishell.framework.data.Data;
+import org.cishell.framework.data.DataProperty;
 import org.cishell.reference.gui.menumanager.menu.AlgorithmWrapper;
 import org.cishell.reference.gui.workflow.Utilities.Constant;
 
@@ -48,23 +49,25 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.TreeEditor;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.part.ViewPart;
@@ -98,8 +101,9 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 	private RunListener runListener;
 	private Algorithm errorAlgorithm;
 	private WorkflowMode mode;
-
-    
+	private TreeEditor editor;
+	private Text newEditor;
+	private boolean updatingTreeItem;
 
 	/**
      * Registers itself to a model, and creates the map from algorithm to 
@@ -147,11 +151,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		this.tree.addSelectionListener(new DatamodelSelectionListener());
 		this.tree.addMouseListener(new ContextMenuListener());
          
-		/*final RowData rowData = new RowData(); 
-		rowData.height = 243; 
-		rowData.width = 168; 
-		this.tree.setLayoutData(rowData);*/
-		// Setup the context menu for the tree.
+	   // Setup the context menu for the tree.
 		
 		this.menu = new Menu(tree);
 		this.menu.setVisible(false);
@@ -169,11 +169,21 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		MenuItem deleteItem = new MenuItem(this.menu, SWT.PUSH);
 		deleteItem.setText("Delete");
 		
-		//this.tree.setMenu(this.menu);
+		MenuItem changeItem = new MenuItem(this.menu, SWT.PUSH);
+		changeItem.setText("Change");
+		changeItem.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event event) {
+				handleInput();
+			}
+		});
+
 		
+		this.editor = new TreeEditor(this.tree);
+		this.editor.horizontalAlignment = SWT.LEFT;
+		this.editor.grabHorizontal = true;
+		this.editor.minimumWidth = 50;
 		
 		//create white spacemennu
-		
 		this.whiteSpacemenu = new Menu(tree);
 		this.whiteSpacemenu.setVisible(false);
 		
@@ -320,12 +330,17 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		if (obj != null) {
 			AttributeDefinition[] attr =
 				obj.getAttributeDefinitions(ObjectClassDefinition.ALL);
-
+			
 			for (int i = 0; i < attr.length; i++) {
 				String id = attr[i].getID();
 				String name = attr[i].getName();
-				String value =parameters.get(id).toString();
-				System.out.println( "id=" +id +"name="+ name +"\n");
+				Object valueRaw = parameters.get(id);
+				String value = "";
+				if(valueRaw != null)
+				{
+					value = valueRaw.toString();
+				}					
+				//System.out.println( "id=" +id +"name="+ name +"\n");
 				GeneralTreeItem  paramName = new GeneralTreeItem( name, Constant.ParameterName, paramItem, getImage("matrix.png","org.cishell.reference.gui.workflow"));
 				paramItem.addChildren(paramName);
 				GeneralTreeItem  paramValue = new GeneralTreeItem( value, Constant.ParameterValue, paramName, getImage("matrix.png","org.cishell.reference.gui.workflow"));
@@ -439,11 +454,9 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 
 				if (item != null) {
 					System.out.println("Item is not null");
-					//WorkflowView.this.tree.getMenu().setVisible(false);
 					WorkflowView.this.tree.setMenu(WorkflowView.this.menu);
 					WorkflowView.this.tree.getMenu().setVisible(true);
 				} else {
-					//WorkflowView.this.tree.getMenu().setVisible(false);
 					WorkflowView.this.tree.setMenu(WorkflowView.this.whiteSpacemenu);
 					WorkflowView.this.tree.getMenu().setVisible(true);
 				}
@@ -488,8 +501,93 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 	        }            
 	    }
 
+	 private void handleInput() {
+			// Clean up any previous editor control
+			Control oldEditor = this.editor.getEditor();
+
+			if (oldEditor != null) {
+				oldEditor.dispose();
+			}
+
+			// Identify the selected row, only allow input if there is a single
+			// selected row
+			TreeItem[] selection = this.tree.getSelection();
+
+			if (selection.length != 1) {
+				return;
+			}
+
+			final TreeItem item = selection[0];
+
+			if (item == null) {
+				return;
+			}
+
+			// The control that will be the editor must be a child of the Table
+			this.newEditor = new Text(this.tree, SWT.NONE);
+			this.newEditor.setText(item.getText());
+			this.newEditor.addFocusListener(new FocusAdapter() {
+				public void focusLost(FocusEvent e) {
+					if (!updatingTreeItem) {
+						updateText(newEditor.getText(), item);
+						
+						
+						// FELIX.  This is not > stupidness.
+					}
+				}
+			});
+
+			// ENTER ESC
+			this.newEditor.addKeyListener(new KeyAdapter() {
+				public void keyReleased(KeyEvent e) {
+					if ((e.character == SWT.CR) && !WorkflowView.this.updatingTreeItem) {
+						updateText(WorkflowView.this.newEditor.getText(), item);
+					} else if (e.keyCode == SWT.ESC) {
+						WorkflowView.this.newEditor.dispose();
+					}
+				}
+			});
+			this.newEditor.selectAll();
+			this.newEditor.setFocus();
+			this.editor.setEditor(this.newEditor, item);
+		}
+
 	
-	
+	 private void updateText(String newLabel, TreeItem item) {
+			this.updatingTreeItem = true;
+	     
+			if (newLabel.startsWith(">"))
+				newLabel = newLabel.substring(1);
+		
+			this.editor.getItem().setText(newLabel);
+			WorkflowTreeItem wfTreeItem =  (WorkflowTreeItem)item.getData();
+			wfTreeItem.setLabel(newLabel);
+			if(wfTreeItem.getType() == Constant.ParameterValue)
+			{
+				String paramName = wfTreeItem.getParent().getLabel();
+				while (wfTreeItem.getParent().getType()!= Constant.AlgorithmItem)
+						wfTreeItem = wfTreeItem.getParent();
+			    wfTreeItem = wfTreeItem.getParent();
+			    WorkflowItem wfg = ((WorkflowItemGUI)wfTreeItem).getWfItem();				
+					
+			}	
+			else if(wfTreeItem.getType() == Constant.Workflow)
+			{
+									
+				
+			}
+			else if(wfTreeItem.getType() == Constant.WorkflowItem)
+			{
+				
+			}
+			viewer.refresh(); 
+			this.newEditor.dispose();
+			updatingTreeItem = false;
+		}
+
+	 
+	 
+	 
 	private class DatamodelSelectionListener extends SelectionAdapter {
 		public void widgetSelected(SelectionEvent e) {
 			//System.out.println("DatamodelSelectionListener called ");
@@ -504,23 +602,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 
 	private class SaveListener implements Listener {
 		public void handleEvent(Event event) {
-			System.out.println("Save button is clicked");
-//			new Thread(
-//					new Runnable(){
-//							public void run(){
-//			savedState = WorkflowManager.getInstance();
-//		String saveFileName = (String)JOptionPane.showInputDialog(null,
-//    			    "Enter File Name", "Save",
-//    			    JOptionPane.PLAIN_MESSAGE,null,null,null);
-////		if(saveFileName!=null && !saveFileName.isEmpty()) {
-////				if(!saveFileName.endsWith(".xml"))
-////					saveFileName = saveFileName+".xml";
-//			WorkflowSaver state = new WorkflowSaver();
-//				state.write(savedState);
-//							}}).start();
-			
-				//	}
-			
+			System.out.println("Save button is clicked");			
 			WorkflowSaver state = new WorkflowSaver();
 			state.write();
 		}
@@ -537,7 +619,6 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		    String type = itm.getType();
 		    if(type == Constant.Workflow)
 		    {
-				System.out.print("Is of type workflow");
                 WorkflowView.this.mode = WorkflowMode.RUNNING;
 			   ((WorkflowGUI)itm).getWorkflow().run();
 			   WorkflowView.this.mode = WorkflowMode.STOPPED;
@@ -550,9 +631,5 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 			WorkflowView.this.addNewWorkflow("Test3");
 					}
 	}
-	
-	
-	
-	
 	
 }

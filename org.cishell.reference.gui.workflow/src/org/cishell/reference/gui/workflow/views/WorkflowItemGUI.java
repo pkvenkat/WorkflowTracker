@@ -58,7 +58,7 @@ public class WorkflowItemGUI implements WorkflowTreeItem {
     private Collection<WorkflowTreeItem> children = new ArrayList<WorkflowTreeItem>();
     //private Algorithm algorithm;
     private WorkflowItem wfItem;
-    private String label;
+	private String label;
     private WorkflowGUI parent;
 
 
@@ -211,7 +211,15 @@ public class WorkflowItemGUI implements WorkflowTreeItem {
 
 	@Override
 	public String getType() {
-		// TODO Auto-generated method stub
 		return Constant.WorkflowItem;
+	}
+
+	@Override
+	public void setLabel(String label) {
+        this.label = label;		
+	}
+	
+    public WorkflowItem getWfItem() {
+		return wfItem;
 	}
 }

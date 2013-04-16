@@ -237,5 +237,10 @@ public class AlgorithmItemGUI implements WorkflowTreeItem {
 		return wfItem;
 	}
 
+	@Override
+	public void setLabel(String label) {
+      this.label = label;		
+	}
+
 	
 }

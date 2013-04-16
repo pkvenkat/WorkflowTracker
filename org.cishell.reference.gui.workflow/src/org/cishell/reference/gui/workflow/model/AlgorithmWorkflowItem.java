@@ -3,6 +3,8 @@ package org.cishell.reference.gui.workflow.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Dictionary;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.List;
 
 import org.cishell.framework.algorithm.Algorithm;
@@ -28,6 +30,7 @@ public class AlgorithmWorkflowItem implements WorkflowItem {
 	private Long internalId;
 	private ServiceReference serviceReference;	
 	private Dictionary<String, Object> parameters;	
+	private Dictionary<String, String> nameToId;	
 	private Data[] inputData;
 	protected Converter[][] converters;
 	private Workflow workflow;
@@ -39,14 +42,40 @@ public class AlgorithmWorkflowItem implements WorkflowItem {
 		this.internalId = id;
 		this.serviceReference = algoRef;		
 		System.out.println("id ="+id);
+		nameToId = new Hashtable<String,String>();
 	}
 	@Override
 	public String getType() {
 		return Constant.AlgorithmItem;
 	}
+	
+	public void add(String name, String id)
+	{
+		this.nameToId.put(name, id);
+	}
+	
+	public void addParameter(String name, Object obj)
+	{
+		String id = this.nameToId.get(name);
+		parameters.put(id, obj);		
+	}
 
+	public Object getParameterValue(String name)
+	{
+		String id = this.nameToId.get(name);
+		return parameters.get(id);				
+	}
+
+	
 	@Override
 	public Object[] run() {
+		
+		for (Enumeration e = parameters.keys(); e.hasMoreElements();) {
+			String key = (String) e.nextElement();
+			Object value = parameters.get(key);
+            System.out.print("key ="+key+""+value.toString());
+		}
+
 		AlgorithmFactory factory =
 				(AlgorithmFactory) Activator.getContext().getService(serviceReference);
 		
@@ -179,9 +208,9 @@ private String[] separateInData(String inDataString) {
     }
 
 	return inData;
-}	
+}		
 
-	
+
 	
 	@Override
 	public String getName() {
@@ -292,31 +321,13 @@ private String[] separateInData(String inDataString) {
 
 		public void start(int capabilities, double totalWorkUnits) {
 			if ((capabilities & ProgressMonitor.CANCELLABLE) > 0){
-				//SchedulerTableItem.this.isCancellable = true;
 			}
 
 			if ((capabilities & ProgressMonitor.PAUSEABLE) > 0) {
-				//SchedulerTableItem.this.isPauseable = true;
 			}
 
 			if ((capabilities & ProgressMonitor.WORK_TRACKABLE) > 0) {
-				/*refresh();
-				SchedulerTableItem.this.isWorkTrackable = true;
-				guiRun(new Runnable() {
-					public void run() {
-						Table table = (Table) progressBar.getParent();
-						SchedulerTableItem.this.progressBar.dispose();
-						SchedulerTableItem.this.progressBar = new ProgressBar(table, SWT.NONE);
-						SchedulerTableItem.this.progressBar.setSelection(progressBar.getMinimum());
-						SchedulerTableItem.this.tableEditor = new TableEditor(table);
-						SchedulerTableItem.this.tableEditor.grabHorizontal = true;
-						SchedulerTableItem.this.tableEditor.grabVertical = true;
-						SchedulerTableItem.this.tableEditor.setEditor(
-							SchedulerTableItem.this.progressBar,
-							SchedulerTableItem.this.tableItem,
-							SchedulerView.PERCENT_COLUMN);
-					}
-				});*/
+			
 			}
 
 			this.totalWorkUnits = totalWorkUnits;
@@ -327,18 +338,7 @@ private String[] separateInData(String inDataString) {
 		}
 
 		public void worked(final double work) {
-			/*guiRun(new Runnable() {
-				public void run() {
-					if (!SchedulerTableItem.this.progressBar.isDisposed()) {
-						SchedulerTableItem.this.progressSelection = (int) (
-							SchedulerTableItem.this.progressBar.getMaximum() *
-							(work / AlgorithmProgressMonitor.this.totalWorkUnits));
 					}
-				}
-			});
-
-			refresh();*/
-		}
 	}
 
 	public Workflow getWorkflow() {

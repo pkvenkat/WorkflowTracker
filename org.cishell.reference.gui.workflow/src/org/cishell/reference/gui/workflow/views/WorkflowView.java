@@ -28,10 +28,8 @@ import org.cishell.framework.algorithm.Algorithm;
 import org.cishell.framework.algorithm.AlgorithmCreationFailedException;
 import org.cishell.framework.algorithm.AlgorithmFactory;
 import org.cishell.framework.algorithm.AlgorithmProperty;
-import org.cishell.framework.algorithm.AllParametersMutatedOutException;
 import org.cishell.framework.algorithm.ParameterMutator;
 import org.cishell.framework.data.Data;
-import org.cishell.framework.data.DataProperty;
 import org.cishell.reference.gui.menumanager.menu.AlgorithmWrapper;
 import org.cishell.reference.gui.workflow.Utilities.Constant;
 
@@ -40,7 +38,6 @@ import org.cishell.reference.gui.workflow.controller.WorkflowSaver;
 import org.cishell.reference.gui.workflow.model.AlgorithmWorkflowItem;
 import org.cishell.reference.gui.workflow.model.SchedulerContentModel;
 import org.cishell.reference.gui.workflow.model.Workflow;
-import org.cishell.reference.gui.workflow.model.NormalWorkflow;
 import org.cishell.reference.gui.workflow.model.WorkflowItem;
 import org.cishell.reference.gui.workflow.views.WorkflowGUI;
 import org.cishell.reference.gui.workflow.views.DataTreeContentProvider;
@@ -181,7 +178,6 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 				handleInput();
 			}
 		});
-
 		
 		this.editor = new TreeEditor(this.tree);
 		this.editor.horizontalAlignment = SWT.LEFT;
@@ -225,19 +221,16 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 
 	@Override
 	public void algorithmRescheduled(Algorithm algorithm, Calendar time) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void algorithmUnscheduled(Algorithm algorithm) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void algorithmStarted(Algorithm algorithm) {
-		
 		
 	}
 	
@@ -301,9 +294,6 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 				if (!tree.isDisposed()) {
 					// update the TreeView
 					WorkflowView.this.viewer.refresh();
-					// context menu may need to have options enabled/disabled
-					// based on the new selection
-					// update the global selection
 					WorkflowView.this.viewer.expandToLevel(dataItem, 0);
 				}
 			}
@@ -328,8 +318,6 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 
 			return ;
 		} catch (Exception e) {
-			//log(LogService.LOG_ERROR, e.getMessage(), e);
-
 			return ;
 		}	
 		
@@ -345,6 +333,8 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 			for (int i = 0; i < attr.length; i++) {
 				String id = attr[i].getID();
 				String name = attr[i].getName();
+				// add this into the hashmap of Algorithm Item
+				wfi.add(name, id);
 				Object valueRaw = parameters.get(id);
 				String value = "";
 				if(valueRaw != null)
@@ -371,8 +361,6 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 				}
 			}
 		});
-		
-
 	}
 
 	@Override
@@ -547,7 +535,6 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 					}
 				}
 			});
-
 			// ENTER ESC
 			this.newEditor.addKeyListener(new KeyAdapter() {
 				public void keyReleased(KeyEvent e) {
@@ -565,6 +552,8 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 
 	
 	 private void updateText(String newLabel, TreeItem item) {
+         System.out.println("Inside Paramete text!!!!!!!!!!!!!");
+
 			this.updatingTreeItem = true;
 	     
 			if (newLabel.startsWith(">"))
@@ -575,21 +564,60 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 			wfTreeItem.setLabel(newLabel);
 			if(wfTreeItem.getType() == Constant.ParameterValue)
 			{
+                System.out.println("Inside Parameter Value!!!!!!!!!!!!!");
+
 				String paramName = wfTreeItem.getParent().getLabel();
-				while (wfTreeItem.getParent().getType()!= Constant.AlgorithmItem)
-						wfTreeItem = wfTreeItem.getParent();
-			    wfTreeItem = wfTreeItem.getParent();
-			    WorkflowItem wfg = ((WorkflowItemGUI)wfTreeItem).getWfItem();				
-					
-			}	
+				WorkflowTreeItem alfoITem = wfTreeItem.getParent().getParent().getParent();
+				
+				System.out.println(" !!!!Type of the Object"+alfoITem.getType());
+			    AlgorithmWorkflowItem wfg = (AlgorithmWorkflowItem)((AlgorithmItemGUI)alfoITem).getWfItem();	
+			    // we are getting the type of the parameter and  using reflection we are creating the object
+			   Object obj = wfg.getParameterValue(paramName);
+			   if(obj != null)
+			   {
+				   //As reflecion does not work it is a work around
+				   if(obj instanceof String)
+				   {
+					   obj = newLabel;
+				   }
+				   else if(obj instanceof Integer)
+				   {
+					   obj = Integer.getInteger(newLabel);
+				   }
+				   else if(obj instanceof java.lang.Boolean)
+				   {
+					   obj=  Boolean.getBoolean(newLabel);
+				   }
+				   else if(obj instanceof java.lang.Float)
+				   {
+					   obj=  Float.parseFloat(newLabel);
+				   }
+				   else if(obj instanceof java.lang.Double)
+				   {
+					   obj=  Double.parseDouble(newLabel);
+				   }
+				   else if(obj instanceof java.lang.Long)
+				   {
+					   obj=  Long.parseLong(newLabel);
+				   }
+				   else if(obj instanceof java.lang.Short)
+				   {
+					   obj=  Short.parseShort(newLabel);
+				   }
+			   }
+			   else
+			   {
+				   obj = newLabel;
+			   }
+			    wfg.addParameter(paramName, obj);
+                System.out.println("parameter is" + obj);
+			} 					
 			else if(wfTreeItem.getType() == Constant.Workflow)
-			{
-									
+			{			
 				
 			}
 			else if(wfTreeItem.getType() == Constant.AlgorithmItem)
-			{
-				
+			{				
 			}
 			viewer.refresh(); 
 			this.newEditor.dispose();
@@ -642,7 +670,6 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 				 AlgorithmWorkflowItem wfItem = (AlgorithmWorkflowItem) aiGUI.getWfItem();
 				 
 				 Workflow wf = wfItem.getWorkflow();
-				 
 				 
 				 WorkflowTreeItem parent = itm.getParent();//GUI
 				 itm.removeAllChildren();

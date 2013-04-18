@@ -85,31 +85,24 @@ public class NormalWorkflow implements Workflow {
 	public void remove(WorkflowItem item) {
 		try{
 		boolean flag=false;
-		LinkedHashMap<Long, WorkflowItem> currentMap = map;
 		
-		Set set =currentMap.entrySet();
+		Set set =map.entrySet();
 		Iterator i = set.iterator();
-//		for(Map.Entry<Long, WorkflowItem> entry: currentMap.entrySet())
-//		{
-//			Long id = entry.getKey();
-//			if(entry.getKey()==item.getIternalId()){
-//				flag = true;
-//			}
-//			if(flag==true){
-//				map.remove(id);
-//			}
-//		}
-		
+
 		while(i.hasNext()){
 			Map.Entry me = (Map.Entry) i.next();
 			if(me.getKey()==item.getIternalId()){
 				flag = true;
 			}
 			if(flag==true){
-				map.remove(me);
+				System.out.println("Removed Algorithm: Key: " + me.getKey() + " Value: "+ me.getValue());
+				System.out.println("Before :" +map.size());
+				map.remove(me.getKey());
+				System.out.println("After :" + map.size());
 			}		
 		}
 		}catch (Exception e){
+			System.out.println("Error in Removing Algorithm");
 			e.printStackTrace();
 		}	
 	}

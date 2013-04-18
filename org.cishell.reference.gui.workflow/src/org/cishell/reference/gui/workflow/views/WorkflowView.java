@@ -195,7 +195,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 
 		newItem.addListener(SWT.Selection, new NewWorkflow());
 		
-        addNewWorkflow("New Workflow ");
+        addNewWorkflow("Workflow ");
 		SchedulerContentModel.getInstance().register(this);             
      }
     protected String getMetaTypeID(ServiceReference ref) {
@@ -705,7 +705,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 
 	private class NewWorkflow implements Listener {
 		public void handleEvent(Event event) {
-			WorkflowView.this.addNewWorkflow("New WorkFlow ");
+			WorkflowView.this.addNewWorkflow("WorkFlow ");
 					}
 	}
 	

@@ -179,6 +179,8 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 			}
 		});
 		
+		WorkflowView.this.tree.setMenu(WorkflowView.this.menu);
+		
 		this.editor = new TreeEditor(this.tree);
 		this.editor.horizontalAlignment = SWT.LEFT;
 		this.editor.grabHorizontal = true;
@@ -193,7 +195,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 
 		newItem.addListener(SWT.Selection, new NewWorkflow());
 		
-        addNewWorkflow("Default Workflow");
+        addNewWorkflow("New Workflow ");
 		SchedulerContentModel.getInstance().register(this);             
      }
     protected String getMetaTypeID(ServiceReference ref) {
@@ -442,11 +444,13 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 
 				if (item != null) {
 					System.out.println("Item is not null");
-					WorkflowView.this.tree.setMenu(WorkflowView.this.menu);
+					//WorkflowView.this.tree.setMenu(WorkflowView.this.menu);
 					WorkflowView.this.tree.getMenu().setVisible(true);
+					WorkflowView.this.whiteSpacemenu.setVisible(false);
 				} else {
-					WorkflowView.this.tree.setMenu(WorkflowView.this.whiteSpacemenu);
-					WorkflowView.this.tree.getMenu().setVisible(true);
+					//WorkflowView.this.tree.setMenu(WorkflowView.this.whiteSpacemenu);
+					WorkflowView.this.tree.getMenu().setVisible(false);
+					WorkflowView.this.whiteSpacemenu.setVisible(true);
 				}
 			}
 		}
@@ -667,7 +671,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 				 wf.remove(wfItem);//model
 				 if(parent.getChildren().length == 0)
 				 {
-					 WorkflowView.this.currentParentItem = WorkflowView.this.currentWorkFlowItem;
+					 WorkflowView.this.currentParentItem = parent;
 				 }
 
 			 }else{
@@ -701,7 +705,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 
 	private class NewWorkflow implements Listener {
 		public void handleEvent(Event event) {
-			WorkflowView.this.addNewWorkflow("Test3");
+			WorkflowView.this.addNewWorkflow("New WorkFlow ");
 					}
 	}
 	

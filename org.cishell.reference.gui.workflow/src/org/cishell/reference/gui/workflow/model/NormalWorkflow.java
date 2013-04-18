@@ -1,25 +1,13 @@
 package org.cishell.reference.gui.workflow.model;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.cishell.app.service.datamanager.DataManagerService;
-import org.cishell.framework.algorithm.AlgorithmProperty;
-import org.cishell.framework.algorithm.ProgressMonitor;
 import org.cishell.framework.data.Data;
-import org.cishell.framework.data.DataProperty;
-import org.cishell.service.conversion.Converter;
-import org.cishell.service.conversion.DataConversionService;
-import org.eclipse.core.internal.registry.osgi.Activator;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.TableEditor;
-import org.eclipse.swt.widgets.ProgressBar;
-import org.eclipse.swt.widgets.Table;
+import org.cishell.reference.gui.workflow.Activator;
 import org.osgi.framework.BundleContext;
 
 
@@ -27,12 +15,14 @@ public class NormalWorkflow implements Workflow {
 	private String name;
 	private Long id;
 	private LinkedHashMap<Long, WorkflowItem> map;
+	private Long lastCreatedID;
 
 	public  NormalWorkflow(String name, Long id)
 	{
 		this.name = name;
 		this.id = id;
 		map = new LinkedHashMap<Long, WorkflowItem> ();
+		lastCreatedID = new Long(1);
 	}
 	
 	@Override
@@ -113,6 +103,12 @@ public class NormalWorkflow implements Workflow {
 	}
 
 	
-	
+	 public Long getUniqueInternalId()
+	 {
+		  while(map.containsKey(lastCreatedID)){
+			   lastCreatedID++;
+		  }
+		  return lastCreatedID;
+	 }
     	
 }

@@ -62,7 +62,10 @@ public class WorkflowManager {
   
   public Long getUniqueInternalId()
   {
-	  return lastCreatedID++;
+	  while(map.containsKey(lastCreatedID)){
+		   lastCreatedID++;
+	  }
+	  return lastCreatedID;
   }
   
 }

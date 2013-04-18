@@ -179,7 +179,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 			}
 		});
 		
-		WorkflowView.this.tree.setMenu(WorkflowView.this.menu);
+		//WorkflowView.this.tree.setMenu(WorkflowView.this.menu);
 		
 		this.editor = new TreeEditor(this.tree);
 		this.editor.horizontalAlignment = SWT.LEFT;
@@ -445,11 +445,11 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 				if (item != null) {
 					System.out.println("Item is not null");
 					//WorkflowView.this.tree.setMenu(WorkflowView.this.menu);
-					WorkflowView.this.tree.getMenu().setVisible(true);
+					WorkflowView.this.menu.setVisible(true);
 					WorkflowView.this.whiteSpacemenu.setVisible(false);
 				} else {
 					//WorkflowView.this.tree.setMenu(WorkflowView.this.whiteSpacemenu);
-					WorkflowView.this.tree.getMenu().setVisible(false);
+					WorkflowView.this.menu.setVisible(false);
 					WorkflowView.this.whiteSpacemenu.setVisible(true);
 				}
 			}

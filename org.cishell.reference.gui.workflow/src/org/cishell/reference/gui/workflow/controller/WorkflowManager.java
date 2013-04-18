@@ -39,7 +39,7 @@ public class WorkflowManager {
 	  Long newID =getUniqueInternalId();
 	  //needed to move this to constants file
 	  if(type == Constant.NormalWorkflow){
-		  currentWorkflow= new NormalWorkflow(name,newID);
+		  currentWorkflow= new NormalWorkflow(name+newID,newID);
 		  map.put(newID, currentWorkflow);
        }
 	  return currentWorkflow;

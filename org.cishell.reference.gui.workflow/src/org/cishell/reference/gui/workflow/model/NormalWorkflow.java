@@ -77,7 +77,7 @@ public class NormalWorkflow implements Workflow {
 
 			}			
 		}
-		if (data.length != 0) {
+		if (data != null && data.length != 0) {
 			for (int ii = 0; ii < data.length; ii++) {
 				dataManager.addData(data[ii]);
 			}

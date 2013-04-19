@@ -79,6 +79,16 @@ public class NormalWorkflow implements Workflow {
 	}
 
 
+    public Long getUniqueInternalId()
+	 {
+		  while(itemMap.containsKey(lastCreatedID))		  
+			   lastCreatedID++;
+				  
+		return lastCreatedID;
+
+	}
+
+
 	@Override
 	public void remove(WorkflowItem item) {
 		try{
@@ -108,15 +118,5 @@ public class NormalWorkflow implements Workflow {
 	@Override
 	public void setName(String name) {
         this.name= name;		
-	}
-
-	
-	 public Long getUniqueInternalId()
-	 {
-		  while(itemMap.containsKey(lastCreatedID)){
-			   lastCreatedID++;
-		  }
-		  return lastCreatedID;
-	 }
-    	
+	}	
 }

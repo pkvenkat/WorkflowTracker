@@ -37,7 +37,7 @@ import org.cishell.reference.gui.workflow.Activator;
  *
  * @author Team IVC
  */
-public class WorkflowItemGUI implements WorkflowTreeItem {
+public class AlgorithmItemGUI implements WorkflowTreeItem {
 	private String brandPluginID;
 	
     //images for the defined types
@@ -59,7 +59,7 @@ public class WorkflowItemGUI implements WorkflowTreeItem {
     //private Algorithm algorithm;
     private WorkflowItem wfItem;
     private String label;
-    private WorkflowGUI parent;
+    private WorkflowTreeItem parent;
 
 
     /**
@@ -68,14 +68,12 @@ public class WorkflowItemGUI implements WorkflowTreeItem {
      * @param model the DataModel this DataModelGUIItem is using
      * @param parent the parent DataModelGUIItem of this DataModelGUIItem
      */
-    public WorkflowItemGUI(WorkflowItem wfItem, WorkflowGUI parent) {
+    public AlgorithmItemGUI(WorkflowItem wfItem, WorkflowTreeItem parent) {
     	if(wfItem instanceof AlgorithmWorkflowItem){
     	
-    		AlgorithmWorkflowItem awfItem = (AlgorithmWorkflowItem)wfItem;
-    		Algorithm algo =awfItem.getAlgorithm();
-                 
-            ServiceReference serviceReference = Activator
-				.getSchedulerService().getServiceReference(algo);
+    		AlgorithmWorkflowItem awfItem = (AlgorithmWorkflowItem)wfItem;  
+    		this.wfItem = wfItem;
+            ServiceReference serviceReference = awfItem.getServiceReference();
 	
 		    if (serviceReference != null) {
 			     label = (String) serviceReference
@@ -144,7 +142,7 @@ public class WorkflowItemGUI implements WorkflowTreeItem {
      *
      * @param item the child of this DataModelGUIItem to remove
      */
-    public void removeChild(WorkflowItemGUI item) {
+    public void removeChild(AlgorithmItemGUI item) {
         this.children.remove(item);
     }
     
@@ -215,6 +213,34 @@ public class WorkflowItemGUI implements WorkflowTreeItem {
 	@Override
 	public String getType() {
 		// TODO Auto-generated method stub
-		return Constant.WorkflowItem;
+		return Constant.AlgorithmUIItem;
 	}
+
+	@Override
+	public void removeAllChildren() {
+		children.clear();
+	}
+
+	@Override
+	public boolean hasChild(WorkflowTreeItem wfTreeItem) {
+		// TODO Auto-generated method stub
+		return children.contains(wfTreeItem);
+	}
+
+	@Override
+	public void removeChild(WorkflowTreeItem wfTreeItem) {
+		children.remove(wfTreeItem);
+		
+	}
+
+	public WorkflowItem getWfItem() {
+		return wfItem;
+	}
+
+	@Override
+	public void setLabel(String label) {
+      this.label = label;		
+	}
+
+	
 }

@@ -33,6 +33,7 @@ import org.cishell.framework.data.Data;
 import org.cishell.reference.gui.menumanager.menu.AlgorithmWrapper;
 import org.cishell.reference.gui.workflow.Utilities.Constant;
 
+import org.cishell.reference.gui.workflow.controller.WorkflowMaker;
 import org.cishell.reference.gui.workflow.controller.WorkflowManager;
 import org.cishell.reference.gui.workflow.controller.WorkflowSaver;
 import org.cishell.reference.gui.workflow.model.AlgorithmWorkflowItem;
@@ -631,10 +632,22 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 
 	private class SaveListener implements Listener {
 		public void handleEvent(Event event) {
-			System.out.println("Save button is clicked");			
-			WorkflowSaver state = new WorkflowSaver();
-			state.write();
+			System.out.println("Save button is clicked");					
+			WorkflowMaker savedState = new WorkflowMaker();
+			savedState.save();
 		}
+	}
+	
+	private class LoadListener implements Listener{
+
+		@Override
+		public void handleEvent(Event event) {
+			System.out.println("Load is clicked");
+			WorkflowMaker loadState = new WorkflowMaker();
+			loadState.load();
+			
+		}
+		
 	}
 	
 	private class DeleteListener implements Listener {

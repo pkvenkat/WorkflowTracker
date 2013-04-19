@@ -65,6 +65,15 @@ public class AlgorithmWorkflowItem implements WorkflowItem {
 		this.nameToId.put(name, id);
 	}
 	
+	public Dictionary<String, String> getNameToId() {
+		return nameToId;
+	}
+	public void setNameToId(Dictionary<String, String> nameToId) {
+		this.nameToId = nameToId;
+	}
+	public void setInternalId(Long internalId) {
+		this.internalId = internalId;
+	}
 	public void addParameter(String name, Object obj)
 	{
 		String id = this.nameToId.get(name);

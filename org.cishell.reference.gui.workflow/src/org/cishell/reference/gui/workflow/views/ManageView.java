@@ -101,6 +101,9 @@ public class ManageView {
 			parent = dataItem;
 			
 			Dictionary<String,Object> params = algoItem.getParameters();
+			Dictionary<String,String> nameToId = algoItem.getNameToId();
+
+			
 			if(params == null || params.isEmpty())
 				continue;
 			final GeneralTreeItem paramLabel = new GeneralTreeItem("Parameters",
@@ -108,15 +111,15 @@ public class ManageView {
 							"org.cishell.reference.gui.workflow"));
 			dataItem.addChild(paramLabel);
 			
-			for (Enumeration e = params.keys(); e.hasMoreElements();) {
+			for (Enumeration e = nameToId.keys(); e.hasMoreElements();) {
 				String key = (String) e.nextElement();
 				String strvalue = "";
-				Object value = params.get(key);
+				Object value = algoItem.getParameterValue(key);
 				if(value != null)
 				{
 					strvalue = value.toString();
 				}
-	            System.out.print("key ="+key+""+value.toString());
+	            System.out.print("key ="+key+""+strvalue.toString());
 	            
 	            GeneralTreeItem paramName = new GeneralTreeItem(key,
 						Constant.ParameterName, paramLabel, Utils.getImage(

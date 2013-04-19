@@ -22,7 +22,7 @@ public class DataTreeContentProvider implements ITreeContentProvider {
 
     /**
      * Returns the children of the given TreeView element.  This parentElement
-     * should be a DataModelGUIItem
+     * should be a WorkflowTreeITem
      *
      * @param parentElement the TreeView element to find the children of
      *
@@ -49,7 +49,7 @@ public class DataTreeContentProvider implements ITreeContentProvider {
 
     /**
      * Gets the parent of the given TreeView element. This element should be
-     * a DataModelGUIItem
+     * a WorkflowTreeITem
      *
      * @param element the element to find the parent of
      *

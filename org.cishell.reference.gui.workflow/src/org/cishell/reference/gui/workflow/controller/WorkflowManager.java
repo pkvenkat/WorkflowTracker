@@ -39,7 +39,7 @@ public class WorkflowManager {
 	  Long newID =getUniqueInternalId();
 	  //needed to move this to constants file
 	  if(type == Constant.NormalWorkflow){
-		  currentWorkflow= new NormalWorkflow(name,newID);
+		  currentWorkflow= new NormalWorkflow(name+newID,newID);
 		  map.put(newID, currentWorkflow);
        }
 	  return currentWorkflow;
@@ -53,14 +53,32 @@ public class WorkflowManager {
 								DataManagerService.class.getName()));
 	  Data[] data = dataManager.getSelectedData();
 	  System.out.println(data[0].getMetadata().get(DataProperty.LABEL));
-	  
 	  return true;
   }
   
+  public void removeWorkflow(Workflow workflow){
+	  map.remove(workflow.getInternalId());
+  }
   
   public Long getUniqueInternalId()
   {
-	  return lastCreatedID +1;
+	  while(map.containsKey(lastCreatedID)){
+		   lastCreatedID++;
+	  }
+	  return lastCreatedID;
   }
+  
+  public LinkedHashMap<Long, Workflow> getMap() {
+		return map;
+	}
+	public void setMap(LinkedHashMap<Long, Workflow> map) {
+		this.map = map;
+	}
+	public Workflow getCurrentWorkflow() {
+		return currentWorkflow;
+	}
+	public void setCurrentWorkflow(Workflow currentWorkflow) {
+		this.currentWorkflow = currentWorkflow;
+	}
   
 }

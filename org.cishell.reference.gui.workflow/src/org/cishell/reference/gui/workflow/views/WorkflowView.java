@@ -19,22 +19,15 @@ package org.cishell.reference.gui.workflow.views;
 import java.io.File;
 import java.util.Calendar;
 import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Map;
-import java.util.Set;
 
-import javax.swing.JOptionPane;
 
 
 import org.cishell.app.service.scheduler.SchedulerListener;
 import org.cishell.framework.algorithm.Algorithm;
 import org.cishell.framework.algorithm.AlgorithmCreationFailedException;
-import org.cishell.framework.algorithm.AlgorithmExecutionException;
 import org.cishell.framework.algorithm.AlgorithmFactory;
 import org.cishell.framework.algorithm.AlgorithmProperty;
-import org.cishell.framework.algorithm.AllParametersMutatedOutException;
 import org.cishell.framework.algorithm.ParameterMutator;
 import org.cishell.framework.data.Data;
 import org.cishell.reference.gui.menumanager.menu.AlgorithmWrapper;
@@ -45,7 +38,6 @@ import org.cishell.reference.gui.workflow.controller.WorkflowSaver;
 import org.cishell.reference.gui.workflow.model.AlgorithmWorkflowItem;
 import org.cishell.reference.gui.workflow.model.SchedulerContentModel;
 import org.cishell.reference.gui.workflow.model.Workflow;
-import org.cishell.reference.gui.workflow.model.NormalWorkflow;
 import org.cishell.reference.gui.workflow.model.WorkflowItem;
 import org.cishell.reference.gui.workflow.views.WorkflowGUI;
 import org.cishell.reference.gui.workflow.views.DataTreeContentProvider;
@@ -54,23 +46,25 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.TreeEditor;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
-import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.part.ViewPart;
@@ -101,9 +95,17 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 	private Menu menu;
 	private Menu whiteSpacemenu;
 	private SaveListener saveListener;
-	
+	private RunListener runListener;
+	private DeleteListener deleteListener;
+	private Algorithm errorAlgorithm;
+	private WorkflowMode mode;
 
-    /**
+	private TreeEditor editor;
+	private Text newEditor;
+	private boolean updatingTreeItem;
+	private WorkflowTreeItem currentParentItem;
+    
+	/**
      * Registers itself to a model, and creates the map from algorithm to 
      * GUI item.
      */
@@ -149,11 +151,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		this.tree.addSelectionListener(new DatamodelSelectionListener());
 		this.tree.addMouseListener(new ContextMenuListener());
          
-		/*final RowData rowData = new RowData(); 
-		rowData.height = 243; 
-		rowData.width = 168; 
-		this.tree.setLayoutData(rowData);*/
-		// Setup the context menu for the tree.
+	   // Setup the context menu for the tree.
 		
 		this.menu = new Menu(tree);
 		this.menu.setVisible(false);
@@ -165,17 +163,30 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		
 		MenuItem runItem = new MenuItem(this.menu, SWT.PUSH);
 		runItem.setText("Run");
-		RunListener runListener = new RunListener();
+		this.runListener = new RunListener();
 		runItem.addListener(SWT.Selection,runListener);
 		
 		MenuItem deleteItem = new MenuItem(this.menu, SWT.PUSH);
 		deleteItem.setText("Delete");
+		this.deleteListener = new DeleteListener();
+		deleteItem.addListener(SWT.Selection, this.deleteListener);
 		
-		//this.tree.setMenu(this.menu);
+		MenuItem changeItem = new MenuItem(this.menu, SWT.PUSH);
+		changeItem.setText("Change");
+		changeItem.addListener(SWT.Selection, new Listener() {
+			public void handleEvent(Event event) {
+				handleInput();
+			}
+		});
 		
+		//WorkflowView.this.tree.setMenu(WorkflowView.this.menu);
+		
+		this.editor = new TreeEditor(this.tree);
+		this.editor.horizontalAlignment = SWT.LEFT;
+		this.editor.grabHorizontal = true;
+		this.editor.minimumWidth = 50;
 		
 		//create white spacemennu
-		
 		this.whiteSpacemenu = new Menu(tree);
 		this.whiteSpacemenu.setVisible(false);
 		
@@ -184,7 +195,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 
 		newItem.addListener(SWT.Selection, new NewWorkflow());
 		
-        addNewWorkflow("Default Workflow");
+        addNewWorkflow("Workflow ");
 		SchedulerContentModel.getInstance().register(this);             
      }
     protected String getMetaTypeID(ServiceReference ref) {
@@ -212,83 +223,16 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 
 	@Override
 	public void algorithmRescheduled(Algorithm algorithm, Calendar time) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void algorithmUnscheduled(Algorithm algorithm) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void algorithmStarted(Algorithm algorithm) {
-		/*ServiceReference serviceReference = Activator
-				.getSchedulerService().getServiceReference(algorithm);
-		String algorithmLabel = "";
-		if (serviceReference != null) {
-			algorithmLabel = (String) serviceReference
-					.getProperty(AlgorithmProperty.LABEL);
-		}
-		AlgorithmFactory factory =
-				(AlgorithmFactory) Activator.getContext().getService(serviceReference);
-
-		String pid = (String) serviceReference.getProperty(Constants.SERVICE_PID);
-          WorkflowItem wfi = new AlgorithmWorkflowItem(algorithmLabel, WorkflowManager.getInstance().getUniqueInternalId(),algorithm);        
-		System.out.println("Algorithm with name"+algorithmLabel+"started");
-		final WorkflowItemGUI dataItem=	new WorkflowItemGUI(wfi, this.currentWorkFlowItem);
-		this.currentWorkFlowItem.addChild(dataItem);
-		
-		guiRun(new Runnable() {
-			public void run() {
-				if (!tree.isDisposed()) {
-					// update the TreeView
-					WorkflowView.this.viewer.refresh();
-					// context menu may need to have options enabled/disabled
-					// based on the new selection
-					// update the global selection
-					WorkflowView.this.viewer.expandToLevel(dataItem, 0);
-				}
-			}
-		});*/
-		
-		// Create algorithm parameters.
-		/*String metatypePID = getMetaTypeID(serviceReference);
-		//get the input parameters 
-		MetaTypeProvider provider = null;
-
-		try {
-			provider = getPossiblyMutatedMetaTypeProvider(metatypePID, pid, factory, serviceReference);
-		} catch (AlgorithmCreationFailedException e) {
-			String format =
-				"An error occurred when creating the algorithm \"%s\" with the data you " +
-				"provided.  (Reason: %s)";
-			String logMessage = String.format(
-				format,
-				serviceReference.getProperty(AlgorithmProperty.LABEL),
-				e.getMessage());
-			//log(LogService.LOG_ERROR, logMessage, e);
-
-			return ;
-		} catch (Exception e) {
-			//log(LogService.LOG_ERROR, e.getMessage(), e);
-
-			return ;
-		}	
-			
-		ObjectClassDefinition obj = provider.getObjectClassDefinition(metatypePID, null);		
-		if (obj != null) {
-			AttributeDefinition[] attr =
-				obj.getAttributeDefinitions(ObjectClassDefinition.ALL);
-
-			for (int i = 0; i < attr.length; i++) {
-				String id = attr[i].getID();
-				String name = attr[i].getName();
-				System.out.println( "id=" +id +"name="+ name +"\n");
-			}
-		}*/
-
 		
 	}
 	
@@ -297,6 +241,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		Workflow workfFlow = WorkflowManager.getInstance().createWorkflow(name, Constant.NormalWorkflow);
 		final WorkflowGUI dataItem=	new WorkflowGUI(workfFlow, this.currentWorkFlowItem, 1);
 		this.currentWorkFlowItem =  dataItem;
+		this.currentParentItem = dataItem;
 		this.rootItem.addChild(dataItem);
 		guiRun(new Runnable() {
 			public void run() {
@@ -312,28 +257,18 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		});	
 	}
 	
+	
 	@Override
 	public void algorithmFinished(Algorithm algorithm, Data[] createdData) {
-		
+		if(algorithm.equals(errorAlgorithm) || mode == WorkflowMode.RUNNING) return;
 		System.out.println("Algorithm class name="+algorithm.getClass());
+		Dictionary<String, Object> parameters = null;
+		if(algorithm instanceof AlgorithmWrapper){
 		
 			AlgorithmWrapper algo = (AlgorithmWrapper)algorithm;
-			Dictionary<String, Object> parameters= algo.getParameters();
-			
-			if(parameters != null)
-			{
-				
-				for (Enumeration e = parameters.keys(); e.hasMoreElements();) {
-					String key = (String) e.nextElement();
-					Object value = parameters.get(key);
-					System.out.println("Key ="+ key +"\n");
-					System.out.println("value ="+ value.toString() +"\n");
-
-				}
-		
-		   }
-		
-				// TODO Auto-generated method stub
+			parameters= algo.getParameters();
+		}
+		//get service reference
 		ServiceReference serviceReference = Activator
 				.getSchedulerService().getServiceReference(algorithm);
 		String algorithmLabel = "";
@@ -345,19 +280,22 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 				(AlgorithmFactory) Activator.getContext().getService(serviceReference);
 
 		String pid = (String) serviceReference.getProperty(Constants.SERVICE_PID);
-          WorkflowItem wfi = new AlgorithmWorkflowItem(algorithmLabel, WorkflowManager.getInstance().getUniqueInternalId(),algorithm);        
+		AlgorithmWorkflowItem wfi = new AlgorithmWorkflowItem(algorithmLabel, WorkflowManager.getInstance().getUniqueInternalId(),serviceReference);
+		wfi.setParameters(parameters);
+		wfi.setWorkflow(currentWorkFlowItem.getWorkflow());
+		currentWorkFlowItem.getWorkflow().add(wfi);
 		System.out.println("Algorithm with name"+algorithmLabel+"started");
-		final WorkflowItemGUI dataItem=	new WorkflowItemGUI(wfi, this.currentWorkFlowItem);
-		this.currentWorkFlowItem.addChild(dataItem);
+		final AlgorithmItemGUI dataItem=	new AlgorithmItemGUI(wfi, this.currentParentItem);
+		this.currentParentItem.addChild(dataItem);
+		System.out.println("current Parent Item !!!!!!!!!!"+ currentParentItem.getType()+" "+currentParentItem.getLabel());
+		this.currentParentItem = dataItem;
+		//this.currentWorkFlowItem.addChild(dataItem);
 		
 		guiRun(new Runnable() {
 			public void run() {
 				if (!tree.isDisposed()) {
 					// update the TreeView
 					WorkflowView.this.viewer.refresh();
-					// context menu may need to have options enabled/disabled
-					// based on the new selection
-					// update the global selection
 					WorkflowView.this.viewer.expandToLevel(dataItem, 0);
 				}
 			}
@@ -382,10 +320,10 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 
 			return ;
 		} catch (Exception e) {
-			//log(LogService.LOG_ERROR, e.getMessage(), e);
-
 			return ;
 		}	
+		
+		if(parameters == null || parameters.isEmpty() ) return;
 				
 		final GeneralTreeItem  paramItem = new GeneralTreeItem("Parameters",Constant.Label, dataItem,getImage("matrix.png","org.cishell.reference.gui.workflow"));
 		dataItem.addChild(paramItem);
@@ -393,13 +331,23 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		if (obj != null) {
 			AttributeDefinition[] attr =
 				obj.getAttributeDefinitions(ObjectClassDefinition.ALL);
-
+			
 			for (int i = 0; i < attr.length; i++) {
 				String id = attr[i].getID();
 				String name = attr[i].getName();
+				// add this into the hashmap of Algorithm Item
+				wfi.add(name, id);
+				Object valueRaw = parameters.get(id);
+				String value = "";
+				if(valueRaw != null)
+				{
+					value = valueRaw.toString();
+				}					
 				//System.out.println( "id=" +id +"name="+ name +"\n");
-				GeneralTreeItem  treeItem = new GeneralTreeItem( name, Constant.Label,paramItem, getImage("matrix.png","org.cishell.reference.gui.workflow"));
-				paramItem.addChildren(treeItem);				
+				GeneralTreeItem  paramName = new GeneralTreeItem( name, Constant.ParameterName, paramItem, getImage("matrix.png","org.cishell.reference.gui.workflow"));
+				paramItem.addChildren(paramName);
+				GeneralTreeItem  paramValue = new GeneralTreeItem( value, Constant.ParameterValue, paramName, getImage("matrix.png","org.cishell.reference.gui.workflow"));
+				paramName.addChildren(paramValue);				
 			}
 		}
 		
@@ -415,13 +363,12 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 				}
 			}
 		});
-		
-
 	}
 
 	@Override
 	public void algorithmError(Algorithm algorithm, Throwable error) {
-		// TODO Auto-generated method stub
+		this.errorAlgorithm = algorithm;
+		
 		
 	}
 
@@ -444,6 +391,10 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 			Display.getDefault().syncExec(run);
 		}
 	}
+	
+	public WorkflowMode getMode() {
+		return mode;
+	}
 	protected MetaTypeProvider getPossiblyMutatedMetaTypeProvider(
 			String metatypePID, String pid,	AlgorithmFactory factory, ServiceReference serviceRef)
 			throws AlgorithmCreationFailedException {
@@ -465,17 +416,6 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 				if (objectClassDefinition == null) {
 					//logNullOCDWarning(pid, metatypePID);
 				}
-
-				/*try {
-					objectClassDefinition =
-						((ParameterMutator) factory).mutateParameters(data, objectClassDefinition);
-
-					if (objectClassDefinition != null) {
-						provider = new BasicMetaTypeProvider(objectClassDefinition);
-					}
-				} catch (AllParametersMutatedOutException e) {
-					provider = null;
-				}*/
 			} catch (IllegalArgumentException e) {
 				//log(LogService.LOG_DEBUG, pid + " has an invalid metatype id: " + metatypePID, e);
 			}
@@ -504,11 +444,13 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 
 				if (item != null) {
 					System.out.println("Item is not null");
-					WorkflowView.this.tree.setMenu(WorkflowView.this.menu);
-					WorkflowView.this.tree.getMenu().setVisible(true);
+					//WorkflowView.this.tree.setMenu(WorkflowView.this.menu);
+					WorkflowView.this.menu.setVisible(true);
+					WorkflowView.this.whiteSpacemenu.setVisible(false);
 				} else {
-					WorkflowView.this.tree.setMenu(WorkflowView.this.whiteSpacemenu);
-					WorkflowView.this.tree.getMenu().setVisible(true);
+					//WorkflowView.this.tree.setMenu(WorkflowView.this.whiteSpacemenu);
+					WorkflowView.this.menu.setVisible(false);
+					WorkflowView.this.whiteSpacemenu.setVisible(true);
 				}
 			}
 		}
@@ -537,7 +479,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 	            		brandPluginID);
 	            	System.err.println(errorMessage);
                     //need to change
-	            	return WorkflowItemGUI.getDefaultImage();
+	            	return AlgorithmItemGUI.getDefaultImage();
 	            }
 	   
 	        } else {
@@ -547,68 +489,224 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 	        	String errorMessage = String.format(format, name, brandPluginID);
 	        	System.err.println(errorMessage);
                 //need to change
-	        	return WorkflowItemGUI.getDefaultImage();
+	        	return AlgorithmItemGUI.getDefaultImage();
 	        }            
 	    }
 
+	 private void handleInput() {
+			// Clean up any previous editor control
+			Control oldEditor = this.editor.getEditor();
+
+			if (oldEditor != null) {
+				oldEditor.dispose();
+			}
+
+			// Identify the selected row, only allow input if there is a single
+			// selected row
+			TreeItem[] selection = this.tree.getSelection();
+
+			if (selection.length != 1) {
+				return;
+			}
+
+			final TreeItem item = selection[0];
+
+			if (item == null) {
+				return;
+			}
+
+			// The control that will be the editor must be a child of the Table
+			this.newEditor = new Text(this.tree, SWT.NONE);
+			this.newEditor.setText(item.getText());
+			this.newEditor.addFocusListener(new FocusAdapter() {
+				public void focusLost(FocusEvent e) {
+					if (!updatingTreeItem) {
+						updateText(newEditor.getText(), item);
+						
+						
+						// FELIX.  This is not > stupidness.
+					}
+				}
+			});
+			// ENTER ESC
+			this.newEditor.addKeyListener(new KeyAdapter() {
+				public void keyReleased(KeyEvent e) {
+					if ((e.character == SWT.CR) && !WorkflowView.this.updatingTreeItem) {
+						updateText(WorkflowView.this.newEditor.getText(), item);
+					} else if (e.keyCode == SWT.ESC) {
+						WorkflowView.this.newEditor.dispose();
+					}
+				}
+			});
+			this.newEditor.selectAll();
+			this.newEditor.setFocus();
+			this.editor.setEditor(this.newEditor, item);
+		}
+
 	
-	
+	 private void updateText(String newLabel, TreeItem item) {
+         System.out.println("Inside Paramete text!!!!!!!!!!!!!");
+
+			this.updatingTreeItem = true;
+	     
+			if (newLabel.startsWith(">"))
+				newLabel = newLabel.substring(1);
+		
+			this.editor.getItem().setText(newLabel);
+			WorkflowTreeItem wfTreeItem =  (WorkflowTreeItem)item.getData();
+			wfTreeItem.setLabel(newLabel);
+			if(wfTreeItem.getType() == Constant.ParameterValue)
+			{
+                System.out.println("Inside Parameter Value!!!!!!!!!!!!!");
+
+				 String paramName = wfTreeItem.getParent().getLabel();
+				 WorkflowTreeItem alfoITem = wfTreeItem.getParent().getParent().getParent();
+				
+				 System.out.println(" !!!!Type of the Object"+alfoITem.getType());
+			     AlgorithmWorkflowItem wfg = (AlgorithmWorkflowItem)((AlgorithmItemGUI)alfoITem).getWfItem();	
+			    // we are getting the type of the parameter and  using reflection we are creating the object
+			     Object obj = wfg.getParameterValue(paramName);
+			     if(obj != null)
+			     {
+				   //As reflecion does not work it is a work around
+				   if(obj instanceof String)
+				   {
+					   obj = newLabel;
+				   }
+				   else if(obj instanceof Integer)
+				   {
+					   obj = Integer.getInteger(newLabel);
+				   }
+				   else if(obj instanceof java.lang.Boolean)
+				   {
+					   obj=  Boolean.getBoolean(newLabel);
+				   }
+				   else if(obj instanceof java.lang.Float)
+				   {
+					   obj=  Float.parseFloat(newLabel);
+				   }
+				   else if(obj instanceof java.lang.Double)
+				   {
+					   obj=  Double.parseDouble(newLabel);
+				   }
+				   else if(obj instanceof java.lang.Long)
+				   {
+					   obj=  Long.parseLong(newLabel);
+				   }
+				   else if(obj instanceof java.lang.Short)
+				   {
+					   obj=  Short.parseShort(newLabel);
+				   }
+			   }
+			   else
+			   {
+				   obj = newLabel;
+			   }
+			    wfg.addParameter(paramName, obj);
+                System.out.println("parameter is" + obj);
+			} 					
+			else if(wfTreeItem.getType() == Constant.Workflow)
+			{			
+				((WorkflowGUI)wfTreeItem).getWorkflow().setName(newLabel);
+			}		
+			viewer.refresh(); 
+			this.newEditor.dispose();
+			updatingTreeItem = false;
+		}
+
+	 
+	 
+	 
 	private class DatamodelSelectionListener extends SelectionAdapter {
 		public void widgetSelected(SelectionEvent e) {
 			//System.out.println("DatamodelSelectionListener called ");
-		/*	Tree tree = (Tree) e.getSource();
-			TreeItem[] selection = tree.getSelection();
-			Set<Data> models = new HashSet<Data>();
-			Data[] modelArray = new Data[selection.length];
-
+		     Tree tree = (Tree) e.getSource();
+			 TreeItem[] selection = tree.getSelection();
+			 
 			for (int i = 0; i < selection.length; i++) {
-				Data model = ((DataGUIItem) selection[i].getData()).getModel();
-				updateContextMenu(model);
-				models.add(model);
-				modelArray[i] = model;
+				//String = ((DataGUIItem) selection[i].getData()).getModel();	
 			}
-
-			AbstractDataManagerView.this.manager.setSelectedData(modelArray);*/
 		}
 	}
 
 	private class SaveListener implements Listener {
 		public void handleEvent(Event event) {
-			System.out.println("Save button is clicked");
-//			new Thread(
-//					new Runnable(){
-//							public void run(){
-//			savedState = WorkflowManager.getInstance();
-//		String saveFileName = (String)JOptionPane.showInputDialog(null,
-//    			    "Enter File Name", "Save",
-//    			    JOptionPane.PLAIN_MESSAGE,null,null,null);
-////		if(saveFileName!=null && !saveFileName.isEmpty()) {
-////				if(!saveFileName.endsWith(".xml"))
-////					saveFileName = saveFileName+".xml";
-//			WorkflowSaver state = new WorkflowSaver();
-//				state.write(savedState);
-//							}}).start();
-			
-				//	}
-			
+			System.out.println("Save button is clicked");			
 			WorkflowSaver state = new WorkflowSaver();
 			state.write();
 		}
 	}
 	
+	private class DeleteListener implements Listener {
+
+		@Override
+		public void handleEvent(Event arg0) {
+			try{
+			TreeItem[] items = WorkflowView.this.tree.getSelection();
+			if(items.length !=1) return;
+			 WorkflowTreeItem itm =(WorkflowTreeItem)items[0].getData();
+			 String type = itm.getType();
+			 if(type == Constant.Workflow)
+			 {	
+				 WorkflowGUI wfGUI = (WorkflowGUI) itm;
+				 System.out.println("Delete "+ wfGUI.getLabel() + " Type:"+ type);
+				 WorkflowManager.getInstance().removeWorkflow(wfGUI.getWorkflow());//model
+				 itm.removeAllChildren();//GUI
+				 rootItem.removeChild(wfGUI);//GUI
+				 WorkflowView.this.viewer.refresh();
+				 if(WorkflowView.this.rootItem.getChildren().length == 0){
+					 WorkflowView.this.addNewWorkflow("Defaul Workflow");
+				 }
+			 }else if (type==Constant.AlgorithmUIItem){
+				 AlgorithmItemGUI aiGUI = (AlgorithmItemGUI) itm;
+				 System.out.println("Delete "+ aiGUI.getLabel() + " Type:"+ type);
+				 AlgorithmWorkflowItem wfItem = (AlgorithmWorkflowItem) aiGUI.getWfItem();				 
+				 Workflow wf = wfItem.getWorkflow();
+				 
+				 WorkflowTreeItem parent = itm.getParent();//GUI
+				 itm.removeAllChildren();
+				 parent.removeChild(itm);
+				 rootItem.removeChild(aiGUI);
+				 WorkflowView.this.viewer.refresh();			
+				 wf.remove(wfItem);//model
+				 if(parent.getChildren().length == 0)
+				 {
+					 WorkflowView.this.currentParentItem = parent;
+				 }
+
+			 }else{
+				 System.out.println("Cant Delete GeneralItem");
+			 }
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+			 
+		}
+		
+	}
+	
 	private class RunListener implements Listener {
 		public void handleEvent(Event event) {
-					}
+			System.out.print("Inside the Run Listner");
+		    TreeItem[] items =	WorkflowView.this.tree.getSelection();
+		    if(items.length !=1) return;
+			System.out.print("only one item selected"+items[0].getClass());
+			
+		    WorkflowTreeItem itm =(WorkflowTreeItem)items[0].getData();
+		    String type = itm.getType();
+		    if(type == Constant.Workflow)
+		    {
+                WorkflowView.this.mode = WorkflowMode.RUNNING;
+			   ((WorkflowGUI)itm).getWorkflow().run();
+			   WorkflowView.this.mode = WorkflowMode.STOPPED;
+		    }
+		}
 	}
 
 	private class NewWorkflow implements Listener {
 		public void handleEvent(Event event) {
-			WorkflowView.this.addNewWorkflow("Test3");
+			WorkflowView.this.addNewWorkflow("WorkFlow ");
 					}
 	}
-	
-	
-	
-	
 	
 }

@@ -51,11 +51,13 @@ public class WorkflowGUI implements WorkflowTreeItem {
     private Image vectorImageIcon;
     private Image modelIcon;
     private Image rIcon;
+    private Workflow workflow;
     
-    private Map<String, Image> typeToImage = new HashMap<String, Image>();
+    
+	private Map<String, Image> typeToImage = new HashMap<String, Image>();
     //for root
     private Collection<WorkflowGUI> children = new ArrayList<WorkflowGUI>();
-    private Collection<WorkflowItemGUI> workFlowItemChildren = new ArrayList<WorkflowItemGUI>();
+    private Collection<AlgorithmItemGUI> workFlowItemChildren = new ArrayList<AlgorithmItemGUI>();
 
     private Algorithm algorithm;
     private String label;
@@ -71,7 +73,8 @@ public class WorkflowGUI implements WorkflowTreeItem {
     
     public WorkflowGUI(Workflow workflow, WorkflowGUI parent,int type) {
     	if(workflow !=null)
-    	    label = workflow.getName();    	
+    	    label = workflow.getName();
+    	this.workflow = workflow;
     	this.brandPluginID = "org.cishell.reference.gui.workflow";
 //      matrixIcon      = getImage("matrix.png", this.brandPluginID);
       modelIcon       = getImage("tree.png", this.brandPluginID);
@@ -133,7 +136,7 @@ public class WorkflowGUI implements WorkflowTreeItem {
         return this.children.toArray();
     }
     
-    public void addChild(WorkflowItemGUI item) {
+    public void addChild(AlgorithmItemGUI item) {
         this.workFlowItemChildren.add(item);
     }
     /**
@@ -215,4 +218,45 @@ public class WorkflowGUI implements WorkflowTreeItem {
 		// TODO Auto-generated method stub
 		return Constant.Workflow;
 	}
+	
+	public Workflow getWorkflow() {
+		return workflow;
+	}
+
+	public void setWorkflow(Workflow workflow) {
+		this.workflow = workflow;
+	}
+
+	@Override
+	public void setLabel(String label) {
+        this.label = label;		
+	}
+
+	@Override
+	public void removeAllChildren() {
+		workFlowItemChildren.clear();
+	}
+
+
+	@Override
+	public boolean hasChild(WorkflowTreeItem wfTreeItem) {
+		// TODO Auto-generated method stub
+		return workFlowItemChildren.contains(wfTreeItem);
+	}
+
+
+	@Override
+	public void removeChild(WorkflowTreeItem wfTreeItem) {
+		workFlowItemChildren.remove(wfTreeItem);
+		
+	}
+
+
+	@Override
+	public void addChild(WorkflowTreeItem wfTreeItem) {
+		if(wfTreeItem instanceof AlgorithmItemGUI )
+			this.workFlowItemChildren.add((AlgorithmItemGUI)wfTreeItem);
+		
+	}
+	
 }

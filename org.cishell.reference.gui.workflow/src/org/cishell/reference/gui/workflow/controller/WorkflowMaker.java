@@ -30,8 +30,8 @@ public class WorkflowMaker {
 		
 	}
 
-	public void save(){		
-	  write();
+	public void save(Workflow wf){		
+	  write(wf);
 	}
 	
 	public synchronized void load(){
@@ -61,16 +61,20 @@ public class WorkflowMaker {
 								//print all the VALUES
 								WorkflowManager mgr =WorkflowManager.getInstance();
 								List<Workflow> list = new ArrayList<Workflow>();
-								 for (Map.Entry<Long, Workflow> entry : saver.getMap().entrySet())
-								   {
-									 System.out.println("\n Load unique id ="+ entry.getKey());
-									 Workflow val =  entry.getValue();
-									 list.add(val);
+							
+								 Workflow wf =  saver.getCurrentWorkflow();
+
+								 list.add(wf);
+								 for(Map.Entry<Long, WorkflowItem> item:((NormalWorkflow)wf).getMap().entrySet())
+									 {
+										System.out.println("class name" +item.getClass());
+										
+										 ((AlgorithmWorkflowItem)item.getValue()).setWorkflow(wf);
+									 }
 									 Long id = mgr.getUniqueInternalId();
 									 System.out.println("\n changed unique id ="+ id);
-									 val.setInternalId(id);
-									 mgr.addWorkflow(id,val);									
-								  }	
+									 wf.setInternalId(id);
+									 mgr.addWorkflow(id,wf);								
 								 
 								 final List<Workflow> wfList = new ArrayList<Workflow>(list);
 								 Display.getDefault().asyncExec(new Runnable() {
@@ -97,7 +101,7 @@ public class WorkflowMaker {
 	}
 	
 	
-	public void write() {
+	public void write(final Workflow wf) {
 		System.out.println("We are in write");
 		
 		new Thread(
@@ -107,7 +111,7 @@ public class WorkflowMaker {
 		writer.autodetectAnnotations(true);
 
 		//writer.alias("workflowmaker", WorkflowMaker.class );
-		String xml = writer.toXML(new WorkflowSaver());
+		String xml = writer.toXML(new WorkflowSaver(wf));
 		File currentDirectory = null;
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -129,8 +133,7 @@ public class WorkflowMaker {
 		}
 		}
 	}).start();
-
-	}
+}
 
 	
 }

@@ -519,8 +519,19 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 	private class SaveListener implements Listener {
 		public void handleEvent(Event event) {
 			System.out.println("Save button is clicked");
+			TreeItem[] items = WorkflowView.this.tree.getSelection();
+			if (items.length != 1)
+				return;
+			WorkflowTreeItem itm = (WorkflowTreeItem) items[0].getData();
+			String type = itm.getType();
+			if (type == Constant.Workflow) {
+				WorkflowGUI wfGUI = (WorkflowGUI) itm;
+				System.out.println("Save " + wfGUI.getLabel() + " Type:"
+						+ type);
+			
 			WorkflowMaker savedState = new WorkflowMaker();
-			savedState.save();
+			savedState.save(wfGUI.getWorkflow());
+			}
 		}
 	}
 

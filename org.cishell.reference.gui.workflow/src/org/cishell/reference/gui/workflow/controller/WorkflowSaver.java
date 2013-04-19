@@ -21,22 +21,22 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 public class WorkflowSaver {
 	
-	private	LinkedHashMap<Long, Workflow> map;
+	//private	LinkedHashMap<Long, Workflow> map;
 	private Workflow currentWorkflow;
 	
-	public WorkflowSaver()
+	public WorkflowSaver(Workflow wf)
 	{
-		this.currentWorkflow =	WorkflowManager.getInstance().getCurrentWorkflow();
-		this.map = WorkflowManager.getInstance().getMap();
+		this.currentWorkflow = wf;
+		//this.map = WorkflowManager.getInstance().getMap();
 	}
 
-	public LinkedHashMap<Long, Workflow> getMap() {
+	/*public LinkedHashMap<Long, Workflow> getMap() {
 		return map;
 	}
 
 	public void setMap(LinkedHashMap<Long, Workflow> map) {
 		this.map = map;
-	}
+	}*/
 
 	public Workflow getCurrentWorkflow() {
 		return currentWorkflow;

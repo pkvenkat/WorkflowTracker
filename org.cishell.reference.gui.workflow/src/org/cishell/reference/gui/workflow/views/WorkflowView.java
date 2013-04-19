@@ -721,7 +721,11 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 	private class NewWorkflow implements Listener {
 		public void handleEvent(Event event) {
 			WorkflowView.this.addNewWorkflow("WorkFlow ");
+			
 					}
 	}
 	
 }
+
+
+

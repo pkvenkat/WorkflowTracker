@@ -75,6 +75,7 @@ public class NormalWorkflow implements Workflow {
 
 	@Override
 	public void add(WorkflowItem item) {
+
         itemMap.put(item.getIternalId(), item);		
 	}
 

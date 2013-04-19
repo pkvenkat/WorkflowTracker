@@ -635,6 +635,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 			System.out.println("Save button is clicked");					
 			WorkflowMaker savedState = new WorkflowMaker();
 			savedState.save();
+
 		}
 	}
 	
@@ -698,6 +699,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		
 	}
 	
+		
 	private class RunListener implements Listener {
 		public void handleEvent(Event event) {
 			System.out.print("Inside the Run Listner");

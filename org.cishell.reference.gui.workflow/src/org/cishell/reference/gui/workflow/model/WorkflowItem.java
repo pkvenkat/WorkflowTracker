@@ -12,6 +12,5 @@ public interface WorkflowItem {
 	//get the name of the workflow Item
 	public String getName();
 	//get the internal Id
-	public Long getIternalId();
-    
+	public Long getIternalId();    
 }

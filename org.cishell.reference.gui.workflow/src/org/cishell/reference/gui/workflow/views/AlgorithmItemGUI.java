@@ -69,20 +69,11 @@ public class AlgorithmItemGUI implements WorkflowTreeItem {
      * @param parent the parent DataModelGUIItem of this DataModelGUIItem
      */
     public AlgorithmItemGUI(WorkflowItem wfItem, WorkflowTreeItem parent) {
-    	if(wfItem instanceof AlgorithmWorkflowItem){
     	
-    		AlgorithmWorkflowItem awfItem = (AlgorithmWorkflowItem)wfItem;  
-    		this.wfItem = wfItem;
-            ServiceReference serviceReference = awfItem.getServiceReference();
-	
-		    if (serviceReference != null) {
-			     label = (String) serviceReference
-					.getProperty(AlgorithmProperty.LABEL);
-		     }
-    	}
-        
+        this.wfItem = wfItem;
+        label =     wfItem.getName();
         this.parent = parent;
-        
+    	
         this.brandPluginID = "org.cishell.reference.gui.workflow";
 //        matrixIcon      = getImage("matrix.png", this.brandPluginID);
         modelIcon        = getImage("model.jpg", this.brandPluginID);

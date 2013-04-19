@@ -11,7 +11,10 @@ import org.cishell.reference.gui.workflow.model.Workflow;
 import org.cishell.reference.gui.workflow.model.NormalWorkflow;
 import org.osgi.framework.BundleContext;
 
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
+
 public class WorkflowManager {
+	@XStreamOmitField
 	static  private WorkflowManager manager = null; 
 	private LinkedHashMap<Long, Workflow> map ;
 	private Workflow currentWorkflow;
@@ -34,6 +37,10 @@ public class WorkflowManager {
 	 return manager;
   }
   
+  public void addWorkflow(Long id, Workflow wf)
+  {
+	  map.put(id, wf);
+  }
   public Workflow createWorkflow(String name, String type)
   {
 	  Long newID =getUniqueInternalId();

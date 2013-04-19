@@ -44,6 +44,6 @@ public class WorkflowSaver {
 
 	public void setCurrentWorkflow(Workflow currentWorkflow) {
 		this.currentWorkflow = currentWorkflow;
-	}				
+	}		
 				
 }

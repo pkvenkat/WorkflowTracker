@@ -42,6 +42,12 @@ public class NormalWorkflow implements Workflow {
 	public Long getInternalId() {
 		return id;
 	}
+	
+	@Override
+	public void setInternalId(Long id) {
+     this.id = id;
+   }
+	
 	@Override
 	public void run() {
 		System.out.println("Running workflow");
@@ -70,6 +76,13 @@ public class NormalWorkflow implements Workflow {
 				System.out.println("Completed Running Algorithm" + algo.getName());
 
 			}			
+		}
+		if (data.length != 0) {
+			for (int ii = 0; ii < data.length; ii++) {
+				dataManager.addData(data[ii]);
+			}
+			dataManager.setSelectedData(data);
+
 		}
 	}
 

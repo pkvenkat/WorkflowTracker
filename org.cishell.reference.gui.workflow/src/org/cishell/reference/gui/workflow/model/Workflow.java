@@ -9,5 +9,7 @@ public interface Workflow {
 	public void run();
 	public void add(WorkflowItem item);
 	public void remove(WorkflowItem item);
+	public void setInternalId(Long id);
+
 
 }

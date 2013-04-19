@@ -22,27 +22,38 @@ import org.cishell.service.conversion.ConversionException;
 import org.cishell.service.conversion.Converter;
 import org.cishell.service.conversion.DataConversionService;
 import org.cishell.service.guibuilder.GUIBuilderService;
+import org.osgi.framework.Constants;
+import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
+
+import com.thoughtworks.xstream.annotations.XStreamOmitField;
 
 public class AlgorithmWorkflowItem implements WorkflowItem {
 	private String name;
 	private Long internalId;
+	@XStreamOmitField
 	private ServiceReference serviceReference;	
 	private Dictionary<String, Object> parameters;	
-	private Dictionary<String, String> nameToId;	
+	private Dictionary<String, String> nameToId;
+	@XStreamOmitField
 	private Data[] inputData;
+	@XStreamOmitField
 	protected Converter[][] converters;
+	@XStreamOmitField
 	private Workflow workflow;
+	private String pid;
 
 	
-	public  AlgorithmWorkflowItem(String name, Long id, ServiceReference algoRef)
+	public  AlgorithmWorkflowItem(String name, Long id, String pid)
 	{
 		this.name = name;
 		this.internalId = id;
-		this.serviceReference = algoRef;		
 		System.out.println("id ="+id);
 		nameToId = new Hashtable<String,String>();
+		this.pid=pid;
+		System.out.println("\npid ="+pid);
+
 	}
 	@Override
 	public String getType() {
@@ -128,6 +139,7 @@ public class AlgorithmWorkflowItem implements WorkflowItem {
 
 	public void dataSelected(Data[] selectedData) {        
         String inDataString = (String) this.serviceReference.getProperty(AlgorithmProperty.IN_DATA);
+        System.out.println("indata="+inDataString);
         String[] inData = separateInData(inDataString);
 
 	
@@ -232,6 +244,7 @@ private String[] separateInData(String inDataString) {
 		return inputData;
 	}
 	public void setInputData(Data[] data) {
+		setServiceReferenceFromBundle();
 		//this.inputData = data;
 		try {
 		    dataSelected(data);
@@ -248,9 +261,7 @@ private String[] separateInData(String inDataString) {
 	public Long getInternalId() {
 		return internalId;
 	}
-	public ServiceReference getServiceReference() {
-		return serviceReference;
-	}
+
 	
 	protected void log(int logLevel, String message, Throwable exception) {
 		LogService logger =
@@ -348,5 +359,25 @@ private String[] separateInData(String inDataString) {
 		this.workflow = workflow;
 	}
 
+	public void setServiceReferenceFromBundle() {
+		System.out.println("PID in the pbject"+ this.pid);
+		ServiceReference[] serviceReferences = null;
+		try {
+			serviceReferences = Activator.getContext().getAllServiceReferences(AlgorithmFactory.class.getName(), null);
+		} catch (InvalidSyntaxException e) {
+			e.printStackTrace();
+		}
+		System.out.println("length =" +serviceReferences.length);
+		for(int i = 0; i < serviceReferences.length; i++)
+		{
+		  String pid=(String)serviceReferences[i].getProperty(Constants.SERVICE_PID);
+			System.out.println(" pid =" +pid);
+		  if(pid.compareTo( this.pid) ==0)
+		  {
+			  this.serviceReference = serviceReferences[i];
+			  break;
+		  }
+		}		
+	}
 
 }

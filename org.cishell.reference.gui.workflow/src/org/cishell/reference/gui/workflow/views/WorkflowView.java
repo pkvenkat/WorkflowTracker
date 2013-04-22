@@ -588,10 +588,10 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 					WorkflowTreeItem parent = itm.getParent();// GUI
 					itm.removeAllChildren();
 					parent.removeChild(itm);
-					rootItem.removeChild(aiGUI);
+					//rootItem.removeChild(aiGUI);
 					WorkflowView.this.viewer.refresh();
 					wf.remove(wfItem);// model
-					if (parent.getChildren().length == 0) {
+					if (parent.getChildren().length == 0 ||WorkflowView.this.currentParentItem == aiGUI) {
 						WorkflowView.this.currentParentItem = parent;
 					}
 

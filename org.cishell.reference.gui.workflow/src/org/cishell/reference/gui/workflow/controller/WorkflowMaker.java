@@ -119,6 +119,12 @@ public class WorkflowMaker {
 		fileChooser.showSaveDialog(null);
 		System.out.println("After null");
 		File file = fileChooser.getSelectedFile();
+		String filePath = file.getPath();
+		if(!filePath.toLowerCase().endsWith(".xml"))
+		{
+		    file = new File(filePath + ".xml");
+		}
+		
 		//File file = new File(state.getFilename());
 		if (file != null) {
 			try {

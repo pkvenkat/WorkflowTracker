@@ -58,6 +58,8 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.log.LogService;
@@ -94,6 +96,13 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 	
 	public WorkflowView() {
 		workFlowView = this;
+		try {
+			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView("org.cishell.reference.gui.datamanager.DataManagerView");
+		} catch (PartInitException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
 
 	/**

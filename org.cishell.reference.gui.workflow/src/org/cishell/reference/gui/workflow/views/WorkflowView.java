@@ -136,11 +136,6 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		this.saveListener = new SaveListener();
 		saveItem.addListener(SWT.Selection, this.saveListener);
 
-		MenuItem loadItem = new MenuItem(this.menu, SWT.PUSH);
-		loadItem.setText("Load");
-		this.loadListener = new LoadListener();
-		loadItem.addListener(SWT.Selection, this.loadListener);
-
 		MenuItem runItem = new MenuItem(this.menu, SWT.PUSH);
 		runItem.setText("Run");
 		this.runListener = new RunListener();
@@ -170,6 +165,12 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 
 		MenuItem newItem = new MenuItem(this.whiteSpacemenu, SWT.PUSH);
 		newItem.setText("New Workflow");
+		
+		MenuItem loadItem = new MenuItem(this.whiteSpacemenu, SWT.PUSH);
+		loadItem.setText("Load");
+		this.loadListener = new LoadListener();
+		loadItem.addListener(SWT.Selection, this.loadListener);
+
 
 		newItem.addListener(SWT.Selection, new NewWorkflow());
 
@@ -470,9 +471,8 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 
 		this.editor.getItem().setText(newLabel);
 		WorkflowTreeItem wfTreeItem = (WorkflowTreeItem) item.getData();
-		wfTreeItem.setLabel(newLabel);
 		if (wfTreeItem.getType() == Constant.ParameterValue) {
-
+           try{
 			String paramName = wfTreeItem.getParent().getLabel();
 			WorkflowTreeItem alfoITem = wfTreeItem.getParent().getParent()
 					.getParent();
@@ -486,9 +486,9 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 				if (obj instanceof String) {
 					obj = newLabel;
 				} else if (obj instanceof Integer) {
-					obj = Integer.getInteger(newLabel);
+					obj = Integer.parseInt(newLabel);
 				} else if (obj instanceof java.lang.Boolean) {
-					obj = Boolean.getBoolean(newLabel);
+					obj = Boolean.parseBoolean(newLabel);
 				} else if (obj instanceof java.lang.Float) {
 					obj = Float.parseFloat(newLabel);
 				} else if (obj instanceof java.lang.Double) {
@@ -503,6 +503,14 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 			}
 			wfg.addParameter(paramName, obj);
 			System.out.println("parameter is" + obj);
+			wfTreeItem.setLabel(newLabel);
+           }
+           catch(Exception e)
+           {
+        	   viewer.refresh();
+       		this.newEditor.dispose();
+       		updatingTreeItem = false;
+           }
 		} else if (wfTreeItem.getType() == Constant.Workflow) {
 			((WorkflowGUI) wfTreeItem).getWorkflow().setName(newLabel);
 		}
@@ -566,7 +574,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 					itm.removeAllChildren();// GUI
 					rootItem.removeChild(wfGUI);// GUI
 					WorkflowView.this.viewer.refresh();
-					if (WorkflowView.this.rootItem.getRootsChildren().length == 0) {
+					if (WorkflowView.this.rootItem.getRootsChildren().length == 0 || WorkflowView.this.currentWorkFlowItem == wfGUI) {
 						WorkflowView.this.addNewWorkflow("New Workflow");
 					}
 				} else if (type == Constant.AlgorithmUIItem) {

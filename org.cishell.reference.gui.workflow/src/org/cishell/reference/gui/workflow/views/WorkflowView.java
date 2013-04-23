@@ -58,6 +58,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
@@ -95,13 +96,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 	private WorkflowTreeItem currentParentItem;
 	
 	public WorkflowView() {
-		workFlowView = this;
-		try {
-			PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView("org.cishell.reference.gui.datamanager.DataManagerView");
-		} catch (PartInitException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		workFlowView = this;		
 		
 	}
 
@@ -124,6 +119,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 	@Override
 	public void createPartControl(Composite parent) {
 
+		
 		this.viewer = new TreeViewer(parent);
 		this.viewer.setContentProvider(new DataTreeContentProvider());
 		this.viewer.setLabelProvider(new DataTreeLabelProvider());
@@ -179,9 +175,24 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 		loadItem.setText("Load");
 		this.loadListener = new LoadListener();
 		loadItem.addListener(SWT.Selection, this.loadListener);
+        
+		guiRun(new Runnable() {
+			public void run() {
+				try {
+					IWorkbenchPage page = WorkflowView.this.getSite().getPage();
 
+					page.showView("org.cishell.reference.gui.datamanager.DataManagerView");
+				} catch (PartInitException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
 
-		newItem.addListener(SWT.Selection, new NewWorkflow());
+				}
+			
+		});
+        
+				newItem.addListener(SWT.Selection, new NewWorkflow());
 
 		addNewWorkflow("Workflow ");
 		SchedulerContentModel.getInstance().register(this);
@@ -230,6 +241,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 
 	@Override
 	public void algorithmFinished(Algorithm algorithm, Data[] createdData) {
+	
 		if (mode == WorkflowMode.RUNNING)
 			return;
 		Dictionary<String, Object> parameters = null;

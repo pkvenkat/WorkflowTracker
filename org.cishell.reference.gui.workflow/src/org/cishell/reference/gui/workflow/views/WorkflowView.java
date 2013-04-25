@@ -454,15 +454,12 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
 			return;
 		}
 
-		// The control that will be the editor must be a child of the Table
 		this.newEditor = new Text(this.tree, SWT.NONE);
 		this.newEditor.setText(item.getText());
 		this.newEditor.addFocusListener(new FocusAdapter() {
 			public void focusLost(FocusEvent e) {
 				if (!updatingTreeItem) {
 					updateText(newEditor.getText(), item);
-
-					// FELIX. This is not > stupidness.
 				}
 			}
 		});
@@ -533,6 +530,7 @@ public class WorkflowView extends ViewPart implements SchedulerListener {
        		updatingTreeItem = false;
            }
 		} else if (wfTreeItem.getType() == Constant.Workflow) {
+			  wfTreeItem.setLabel(newLabel);
 			((WorkflowGUI) wfTreeItem).getWorkflow().setName(newLabel);
 		}
 		viewer.refresh();

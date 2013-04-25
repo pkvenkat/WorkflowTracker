@@ -2,9 +2,6 @@ package org.cishell.reference.gui.workflow;
 import java.io.File;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IStartup;
@@ -20,8 +17,6 @@ import org.cishell.app.service.scheduler.SchedulerService;
 import org.cishell.framework.CIShellContext;
 import org.cishell.framework.LocalCIShellContext;
 import org.cishell.reference.gui.workflow.views.WorkflowView;
-import org.cishell.reference.gui.workspace.CIShellApplication;
-
 
 
 public class Activator extends AbstractUIPlugin implements IStartup{

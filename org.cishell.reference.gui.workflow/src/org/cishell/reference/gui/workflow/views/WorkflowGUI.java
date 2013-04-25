@@ -13,8 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.cishell.framework.algorithm.Algorithm;
-import org.cishell.framework.algorithm.AlgorithmProperty;
-import org.cishell.framework.data.Data;
+
 import org.cishell.framework.data.DataProperty;
 import org.cishell.reference.gui.workflow.Utilities.Constant;
 import org.cishell.reference.gui.workflow.model.Workflow;
@@ -22,9 +21,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.osgi.framework.ServiceReference;
-
-import org.cishell.reference.gui.workflow.Activator;
 
 
 /**

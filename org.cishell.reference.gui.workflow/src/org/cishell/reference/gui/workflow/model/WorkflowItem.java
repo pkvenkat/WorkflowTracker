@@ -1,7 +1,5 @@
 package org.cishell.reference.gui.workflow.model;
 
-import org.cishell.framework.data.Data;
-
 public interface WorkflowItem {
 	
 	// provides the type of the workflow Item

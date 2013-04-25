@@ -2,9 +2,6 @@ package org.cishell.reference.gui.workflow.views;
 
 import java.util.ArrayList;
 import java.util.Collection;
-
-import javax.swing.Icon;
-
 import org.eclipse.swt.graphics.Image;
 
 public class GeneralTreeItem implements WorkflowTreeItem {

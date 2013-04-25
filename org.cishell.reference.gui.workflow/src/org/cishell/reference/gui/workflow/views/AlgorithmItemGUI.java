@@ -11,22 +11,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.cishell.framework.algorithm.Algorithm;
-import org.cishell.framework.algorithm.AlgorithmProperty;
-import org.cishell.framework.data.Data;
 import org.cishell.framework.data.DataProperty;
 import org.cishell.reference.gui.workflow.Utilities.Constant;
-import org.cishell.reference.gui.workflow.model.AlgorithmWorkflowItem;
-import org.cishell.reference.gui.workflow.model.Workflow;
 import org.cishell.reference.gui.workflow.model.WorkflowItem;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
-import org.osgi.framework.ServiceReference;
-
-import org.cishell.reference.gui.workflow.Activator;
 
 
 /**
@@ -63,10 +54,10 @@ public class AlgorithmItemGUI implements WorkflowTreeItem {
 
 
     /**
-     * Creates a new DataModelGUIItem object.
+     * Creates a new AlgorithmItemGUI object.
      *
-     * @param model the DataModel this DataModelGUIItem is using
-     * @param parent the parent DataModelGUIItem of this DataModelGUIItem
+     * @param wfItem the DataModel this AlgorithmItemGUI is using
+     * @param parent the parent WorkflowTreeItem of this DataModelGUIItem
      */
     public AlgorithmItemGUI(WorkflowItem wfItem, WorkflowTreeItem parent) {
     	
@@ -99,10 +90,10 @@ public class AlgorithmItemGUI implements WorkflowTreeItem {
 
  
     /**
-     * Returns the parent DataModelGUIItem of this DataModelGUIItem, or
+     * Returns the parent WorkflowTreeItem of this AlgorithmItemGUI, or
      * null if this is the root item.
      *
-     * @return the parent DataModelGUIItem of this DataModelGUIItem, or
+     * @return the parent WorkflowTreeItem of this AlgorithmItemGUI, or
      * null if this is the root item
      */
     public WorkflowTreeItem getParent() {
@@ -110,47 +101,33 @@ public class AlgorithmItemGUI implements WorkflowTreeItem {
     }
 
     /**
-     * Adds the given DataModelGUIItem as a child of this DataModelGUIItem
+     * Adds the given WorkflowTreeItem as a child of this AlgorithmItemGUI
      *
-     * @param item the new child of this DataModelGUIItem
+     * @param item the new child of this AlgorithmItemGUI
      */
     public void addChild(WorkflowTreeItem item) {
         this.children.add(item);
     }
 
     /**
-     * Returns an array of all of the children of this DataModelGUIItem
+     * Returns an array of all of the children of this AlgorithmItemGUI
      *
-     * @return an array of all of the children of this DataModelGUIItem
+     * @return an array of all of the children of this AlgorithmItemGUI
      */
     public Object[] getChildren() {
         return this.children.toArray();
     }
 
     /**
-     * Removes the given DataModelGUIItem from the collection of children
-     * of this DataModelGUIItem.
+     * Removes the given AlgorithmItemGUI from the collection of children
+     * of this AlgorithmItemGUI.
      *
-     * @param item the child of this DataModelGUIItem to remove
+     * @param item the child of this AlgorithmItemGUI to remove
      */
     public void removeChild(AlgorithmItemGUI item) {
         this.children.remove(item);
     }
     
-//    /**
-//     * Returns the icon associated with this DataModel for display in IVC.
-//     * 
-//     * @return the icon associated with this DataModel for display in IVC
-//     */
-//    public Image getIcon() {
-//        Image icon = this.typeToImage.get(dataProperty);
-//
-//        if (icon == null) {
-//        	icon = unknownIcon;
-//        }
-//
-//        return icon;
-//    }
     
     public Image getIcon() {
      
@@ -203,7 +180,6 @@ public class AlgorithmItemGUI implements WorkflowTreeItem {
 
 	@Override
 	public String getType() {
-		// TODO Auto-generated method stub
 		return Constant.AlgorithmUIItem;
 	}
 
@@ -214,7 +190,6 @@ public class AlgorithmItemGUI implements WorkflowTreeItem {
 
 	@Override
 	public boolean hasChild(WorkflowTreeItem wfTreeItem) {
-		// TODO Auto-generated method stub
 		return children.contains(wfTreeItem);
 	}
 
